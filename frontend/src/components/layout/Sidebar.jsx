@@ -11,37 +11,48 @@ export default function Sidebar({ isOpen, onClose }) {
     navigate('/login');
   };
 
+  const handleNavClick = () => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 900) {
+      onClose();
+    }
+  };
+
   const isAdmin = user?.role?.toLowerCase() === 'admin';
 
   return (
     <>
       {isOpen && (
         <div 
+          className="sidebar-backdrop"
           onClick={onClose}
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.3)',
-            zIndex: 35
+            backgroundColor: 'rgba(0,0,0,0.35)',
+            backdropFilter: 'blur(2px)',
+            zIndex: 45,
+            transition: 'opacity 0.25s ease',
           }}
         />
       )}
 
-      <aside className={`app-sidebar ${isOpen ? 'open' : ''}`}>
+      <aside className={`app-sidebar ${isOpen ? 'open' : 'collapsed'}`}>
         {/* Brand Header */}
-        <NavLink to="/dashboard" className="sidebar-brand" onClick={onClose}>
-          <div className="brand-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="2" y1="12" x2="22" y2="12"></line>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-            </svg>
-          </div>
-          <div>
-            <div className="brand-title">GlobeTrotter</div>
-            <div className="brand-subtitle">Travel Planner</div>
-          </div>
-        </NavLink>
+        <div className="sidebar-brand-wrapper" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-passive)' }}>
+          <NavLink to="/dashboard" className="sidebar-brand" onClick={handleNavClick} style={{ borderBottom: 'none', flex: 1 }}>
+            <div className="brand-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </div>
+            <div className="brand-text-block">
+              <div className="brand-title">GlobeTrotter</div>
+              <div className="brand-subtitle">Travel Planner</div>
+            </div>
+          </NavLink>
+        </div>
 
         {/* Navigation */}
         <div className="sidebar-nav">
@@ -50,7 +61,7 @@ export default function Sidebar({ isOpen, onClose }) {
             to="/dashboard" 
             end
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-            onClick={onClose}
+            onClick={handleNavClick}
           >
             <div className="nav-item-left">
               <span className="nav-item-icon">
@@ -69,7 +80,7 @@ export default function Sidebar({ isOpen, onClose }) {
           <NavLink 
             to="/trips/new" 
             className={({ isActive }) => `nav-item green-module ${isActive ? 'active' : ''}`}
-            onClick={onClose}
+            onClick={handleNavClick}
           >
             <div className="nav-item-left">
               <span className="nav-item-icon">
@@ -87,7 +98,7 @@ export default function Sidebar({ isOpen, onClose }) {
             to="/trips" 
             end
             className={({ isActive }) => `nav-item green-module ${isActive ? 'active' : ''}`}
-            onClick={onClose}
+            onClick={handleNavClick}
           >
             <div className="nav-item-left">
               <span className="nav-item-icon">
@@ -106,7 +117,7 @@ export default function Sidebar({ isOpen, onClose }) {
           <NavLink 
             to="/community" 
             className={({ isActive }) => `nav-item green-module ${isActive ? 'active' : ''}`}
-            onClick={onClose}
+            onClick={handleNavClick}
           >
             <div className="nav-item-left">
               <span className="nav-item-icon">
@@ -122,7 +133,7 @@ export default function Sidebar({ isOpen, onClose }) {
           <NavLink 
             to="/profile" 
             className={({ isActive }) => `nav-item green-module ${isActive ? 'active' : ''}`}
-            onClick={onClose}
+            onClick={handleNavClick}
           >
             <div className="nav-item-left">
               <span className="nav-item-icon">
@@ -141,7 +152,7 @@ export default function Sidebar({ isOpen, onClose }) {
           <NavLink 
             to="/trips/builder" 
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-            onClick={onClose}
+            onClick={handleNavClick}
           >
             <div className="nav-item-left">
               <span className="nav-item-icon">
@@ -157,7 +168,7 @@ export default function Sidebar({ isOpen, onClose }) {
           <NavLink 
             to="/trips/itinerary" 
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-            onClick={onClose}
+            onClick={handleNavClick}
           >
             <div className="nav-item-left">
               <span className="nav-item-icon">
@@ -179,7 +190,7 @@ export default function Sidebar({ isOpen, onClose }) {
               <NavLink 
                 to="/admin" 
                 className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-                onClick={onClose}
+                onClick={handleNavClick}
               >
                 <div className="nav-item-left">
                   <span className="nav-item-icon">
