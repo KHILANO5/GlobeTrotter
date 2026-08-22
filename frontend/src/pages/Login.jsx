@@ -74,14 +74,15 @@ function Login() {
           />
         </div>
 
-        <button 
-          type="submit" 
-          className="btn btn-primary" 
-          disabled={loading}
-          style={{ marginBottom: '1.5rem' }}
-        >
-          {loading ? 'Signing in...' : 'Sign In'}
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+          <button 
+            type="submit" 
+            className="btn btn-primary" 
+            disabled={loading}
+          >
+            {loading ? 'Signing in...' : 'Sign In'}
+          </button>
+        </div>
 
         <p style={{ fontSize: '0.9rem', textAlign: 'center', color: 'var(--text-muted)' }}>
           Don't have an account? <Link to="/register" style={{ color: 'var(--text-charcoal)', textDecoration: 'underline', fontWeight: '500' }}>Register here</Link>

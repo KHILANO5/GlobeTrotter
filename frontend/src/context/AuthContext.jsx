@@ -39,9 +39,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (fullName, email, password) => {
+  const register = async (formData) => {
     try {
-      const data = await api.post('/register', { fullName, email, password });
+      const data = await api.post('/register', formData);
       return data;
     } catch (err) {
       throw err;
