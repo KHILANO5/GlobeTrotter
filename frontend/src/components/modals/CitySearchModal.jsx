@@ -194,10 +194,10 @@ export default function CitySearchModal({ isOpen, onClose, onSelectCity, tripDat
                 value={stopType}
                 onChange={e => setStopType(e.target.value)}
               >
-                <option value="city_stop">🏙️ City Stop</option>
-                <option value="travel">✈️ Travel / Flight Leg</option>
-                <option value="lodging">🏨 Lodging / Hotel Stay</option>
-                <option value="activity_block">🎯 Activity Block</option>
+                <option value="city_stop">City Stop</option>
+                <option value="travel">Travel / Flight Leg</option>
+                <option value="lodging">Lodging / Hotel Stay</option>
+                <option value="activity_block">Activity Block</option>
               </select>
             </div>
           </div>

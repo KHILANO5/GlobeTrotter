@@ -61,11 +61,11 @@ export default function ExpenseModal({ isOpen, onClose, onAddExpense, stops = []
                 value={category}
                 onChange={e => setCategory(e.target.value)}
               >
-                <option value="transport">✈️ Transport (Flight / Train / Taxi)</option>
-                <option value="stay">🏨 Stay (Hotel / Airbnb)</option>
-                <option value="activities">🎟️ Activities / Tickets</option>
-                <option value="meals">🍽️ Meals / Dining</option>
-                <option value="other">🏷️ Other / Misc</option>
+                <option value="transport">Transport (Flight / Train / Taxi)</option>
+                <option value="stay">Stay (Hotel / Airbnb)</option>
+                <option value="activities">Activities / Tickets</option>
+                <option value="meals">Meals / Dining</option>
+                <option value="other">Other / Misc</option>
               </select>
             </div>
 

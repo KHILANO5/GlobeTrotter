@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import ShareModal from '../components/modals/ShareModal';
+import { CalendarIcon, GlobeIcon, EditIcon, ShareIcon, TrashIcon, FlightIcon, LuggageIcon, CompassIcon, AlertCircleIcon } from '../components/common/Icons';
 
 export default function MyTripsPage() {
   const [trips, setTrips] = useState([]);
@@ -198,7 +199,10 @@ export default function MyTripsPage() {
       {/* Error Alert with Retry */}
       {error && (
         <div style={{ padding: '1rem 1.25rem', backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', color: '#dc2626', marginBottom: '1.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>⚠️ {error}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <AlertCircleIcon size={16} />
+            <span>{error}</span>
+          </div>
           <button type="button" onClick={fetchTrips} className="btn btn-secondary btn-sm" style={{ borderColor: '#dc2626', color: '#dc2626' }}>
             Try Again
           </button>
@@ -244,8 +248,8 @@ export default function MyTripsPage() {
                       }}
                     />
                   ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px', backgroundColor: 'rgba(28,28,28,0.03)' }}>
-                      ✈️
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(28,28,28,0.03)' }}>
+                      <FlightIcon size={32} style={{ color: 'var(--text-muted)' }} />
                     </div>
                   )}
 
@@ -264,8 +268,9 @@ export default function MyTripsPage() {
                       {trip.status}
                     </span>
                     {trip.isPublic && (
-                      <span className="nav-badge green" style={{ fontSize: '10px', fontWeight: '600', boxShadow: '0 1px 4px rgba(0,0,0,0.1)' }}>
-                        🌐 Shared
+                      <span className="nav-badge green" style={{ fontSize: '10px', fontWeight: '600', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <GlobeIcon size={11} />
+                        <span>Shared</span>
                       </span>
                     )}
                   </div>
@@ -278,7 +283,10 @@ export default function MyTripsPage() {
                       {trip.name}
                     </h3>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '12px', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
-                      <span>📅 {new Date(trip.startDate).toLocaleDateString()} – {new Date(trip.endDate).toLocaleDateString()}</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <CalendarIcon size={12} />
+                        <span>{new Date(trip.startDate).toLocaleDateString()} – {new Date(trip.endDate).toLocaleDateString()}</span>
+                      </span>
                       {duration && <span>• <strong>{duration}</strong></span>}
                     </div>
                   </div>
@@ -303,17 +311,18 @@ export default function MyTripsPage() {
                     <Link to={`/trips/${trip.id}/itinerary`} className="btn btn-primary btn-sm" style={{ flex: 1, textAlign: 'center' }}>
                       View Hub →
                     </Link>
-                    <Link to={`/trips/${trip.id}/builder`} className="btn btn-secondary btn-sm" title="Edit in Builder">
-                      ✏️ Edit
+                    <Link to={`/trips/${trip.id}/builder`} className="btn btn-secondary btn-sm" title="Edit in Builder" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                      <EditIcon size={13} />
+                      <span>Edit</span>
                     </Link>
                     <button
                       type="button"
                       onClick={() => setShareModalTrip(trip)}
                       className="btn btn-ghost btn-sm"
                       title="Share trip"
-                      style={{ padding: '6px 8px' }}
+                      style={{ padding: '6px 8px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                     >
-                      🔗
+                      <ShareIcon size={13} />
                     </button>
                     <button
                       type="button"
@@ -321,9 +330,9 @@ export default function MyTripsPage() {
                       disabled={isDeleting}
                       className="btn btn-ghost btn-sm"
                       title="Delete trip"
-                      style={{ color: '#dc2626', padding: '6px 8px' }}
+                      style={{ color: '#dc2626', padding: '6px 8px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                     >
-                      {isDeleting ? '...' : '🗑️'}
+                      {isDeleting ? '...' : <TrashIcon size={13} />}
                     </button>
                   </div>
                 </div>
@@ -334,7 +343,9 @@ export default function MyTripsPage() {
       ) : trips.length === 0 ? (
         /* Empty State: No Trips in Account */
         <div className="shell-container" style={{ padding: '3.5rem 2rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '44px', marginBottom: '0.75rem' }}>🧳</div>
+          <div style={{ marginBottom: '0.75rem', display: 'flex', justifyContent: 'center' }}>
+            <LuggageIcon size={44} style={{ color: 'var(--text-muted)' }} />
+          </div>
           <h3 style={{ margin: '0 0 0.5rem 0' }}>No Trips Planned Yet</h3>
           <p className="text-muted text-sm" style={{ maxWidth: '440px', margin: '0 auto 1.75rem' }}>
             You haven't created any travel plans yet. Start building your first personalized journey with destinations, activities, and budget tracking.
@@ -346,7 +357,9 @@ export default function MyTripsPage() {
       ) : (
         /* Empty State: No search results */
         <div className="shell-container" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '36px', marginBottom: '0.5rem' }}>🔍</div>
+          <div style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'center' }}>
+            <CompassIcon size={36} style={{ color: 'var(--text-muted)' }} />
+          </div>
           <h3 style={{ margin: '0 0 0.5rem 0' }}>No Matching Trips Found</h3>
           <p className="text-muted text-sm" style={{ maxWidth: '400px', margin: '0 auto 1.5rem' }}>
             No journeys match your filter <strong>"{statusFilter}"</strong> {searchTerm && `or search term "${searchTerm}"`}.

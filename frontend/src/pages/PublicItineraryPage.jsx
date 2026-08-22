@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { CalendarIcon, MapPinIcon, ClockIcon, CopyIcon } from '../components/common/Icons';
 
 export default function PublicItineraryPage() {
   const { shareToken } = useParams();
@@ -110,8 +111,12 @@ export default function PublicItineraryPage() {
                 <span className="nav-badge">Shared by {ownerDisplayName}</span>
               </div>
               <h1 style={{ margin: '0.25rem 0', fontSize: '26px' }}>{tripName}</h1>
-              <p className="text-sm text-muted" style={{ margin: 0 }}>
-                📅 {new Date(startDate).toLocaleDateString()} – {new Date(endDate).toLocaleDateString()} • {days.length} Days Itinerary
+              <p className="text-sm text-muted" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <CalendarIcon size={13} />
+                  <span>{new Date(startDate).toLocaleDateString()} – {new Date(endDate).toLocaleDateString()}</span>
+                </span>
+                <span>• {days.length} Days Itinerary</span>
               </p>
             </div>
 
@@ -120,9 +125,10 @@ export default function PublicItineraryPage() {
               className="btn btn-primary"
               onClick={handleCopyTrip}
               disabled={copying}
-              style={{ fontSize: '14px', padding: '10px 22px' }}
+              style={{ fontSize: '14px', padding: '10px 22px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
-              {copying ? 'Copying to Account...' : '📋 Copy Trip to My Account'}
+              <CopyIcon size={14} />
+              <span>{copying ? 'Copying to Account...' : 'Copy Trip to My Account'}</span>
             </button>
           </div>
 
@@ -164,7 +170,9 @@ export default function PublicItineraryPage() {
                 <span style={{ fontWeight: '600', fontSize: '14px', color: 'var(--text-charcoal)' }}>
                   {new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                 </span>
-                <span className="text-muted text-sm">• 📍 {day.stopTitle}</span>
+                <span className="text-muted text-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                  • <MapPinIcon size={12} /> {day.stopTitle}
+                </span>
               </div>
             </div>
 
@@ -183,8 +191,9 @@ export default function PublicItineraryPage() {
                         gap: '0.85rem',
                       }}
                     >
-                      <span style={{ fontWeight: '700', fontSize: '12px', color: 'var(--accent-terra)' }}>
-                        ⏰ {act.scheduledTime || '09:00'}
+                      <span style={{ fontWeight: '700', fontSize: '12px', color: 'var(--accent-terra)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                        <ClockIcon size={12} />
+                        <span>{act.scheduledTime || '09:00'}</span>
                       </span>
                       <span style={{ fontWeight: '500', fontSize: '14px', color: 'var(--text-charcoal)' }}>
                         {act.name}
@@ -216,9 +225,10 @@ export default function PublicItineraryPage() {
           className="btn btn-primary"
           onClick={handleCopyTrip}
           disabled={copying}
-          style={{ padding: '10px 24px', fontSize: '15px' }}
+          style={{ padding: '10px 24px', fontSize: '15px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
         >
-          {copying ? 'Copying...' : '📋 Copy Trip to My Account →'}
+          <CopyIcon size={15} />
+          <span>{copying ? 'Copying...' : 'Copy Trip to My Account →'}</span>
         </button>
       </div>
     </div>
