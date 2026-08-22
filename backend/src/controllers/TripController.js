@@ -1,0 +1,271 @@
+const { db } = require('../config/db');
+const { trips, tripStops, users } = require('../db/schema');
+const { eq, desc, asc, and, ilike, sql } = require('drizzle-orm');
+
+// GET /api/v1/trips & /api/trips
+const getTrips = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { status, search, sort = 'startDate:asc', page = 1, pageSize = 20 } = req.query;
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(pageSize, 10) || 20));
+    const offsetNum = (pageNum - 1) * limitNum;
+
+    const conditions = [eq(trips.userId, userId)];
+
+    if (status && ['upcoming', 'ongoing', 'completed'].includes(status.toLowerCase())) {
+      conditions.push(eq(trips.status, status.toLowerCase()));
+    }
+
+    if (search && search.trim()) {
+      conditions.push(ilike(trips.name, `%${search.trim()}%`));
+    }
+
+    const whereClause = and(...conditions);
+
+    // Sorting
+    let orderByClause = asc(trips.startDate);
+    if (sort) {
+      const [field, direction] = sort.split(':');
+      const isAsc = direction === 'asc';
+      if (field === 'startDate') orderByClause = isAsc ? asc(trips.startDate) : desc(trips.startDate);
+      else if (field === 'createdAt') orderByClause = isAsc ? asc(trips.createdAt) : desc(trips.createdAt);
+      else if (field === 'name') orderByClause = isAsc ? asc(trips.name) : desc(trips.name);
+    }
+
+    const tripList = await db
+      .select({
+        id: trips.id,
+        name: trips.name,
+        description: trips.description,
+        startDate: trips.startDate,
+        endDate: trips.endDate,
+        status: trips.status,
+        totalBudget: trips.totalBudget,
+        coverPhotoUrl: trips.coverPhotoUrl,
+        isPublic: trips.isPublic,
+        createdAt: trips.createdAt,
+        updatedAt: trips.updatedAt
+      })
+      .from(trips)
+      .where(whereClause)
+      .orderBy(orderByClause)
+      .limit(limitNum)
+      .offset(offsetNum);
+
+    const [countResult] = await db
+      .select({ total: sql`count(*)` })
+      .from(trips)
+      .where(whereClause);
+
+    const total = parseInt(countResult?.total || 0, 10);
+    const totalPages = Math.ceil(total / limitNum);
+
+    return res.status(200).json({
+      data: tripList,
+      meta: {
+        page: pageNum,
+        pageSize: limitNum,
+        total,
+        totalPages
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching trips:', err);
+    return res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to fetch trips.'
+      }
+    });
+  }
+};
+
+// POST /api/v1/trips & /api/trips
+const createTrip = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { name, description, startDate, endDate, totalBudget, coverPhotoUrl } = req.body;
+
+    if (!name || !startDate || !endDate) {
+      return res.status(422).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Trip name, start date, and end date are required.'
+        }
+      });
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (end < start) {
+      return res.status(422).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'End date cannot be earlier than start date.'
+        }
+      });
+    }
+
+    const now = new Date();
+    let status = 'upcoming';
+    if (now >= start && now <= end) {
+      status = 'ongoing';
+    } else if (now > end) {
+      status = 'completed';
+    }
+
+    const [newTrip] = await db
+      .insert(trips)
+      .values({
+        userId,
+        name: name.trim(),
+        description: description ? description.trim() : null,
+        startDate: startDate,
+        endDate: endDate,
+        status,
+        totalBudget: totalBudget ? String(totalBudget) : null,
+        coverPhotoUrl: coverPhotoUrl || null
+      })
+      .returning();
+
+    return res.status(201).json({ data: newTrip });
+  } catch (err) {
+    console.error('Error creating trip:', err);
+    return res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to create trip.'
+      }
+    });
+  }
+};
+
+// GET /api/v1/trips/:tripId & /api/trips/:tripId
+const getTripById = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { tripId } = req.params;
+
+    const [trip] = await db
+      .select()
+      .from(trips)
+      .where(and(eq(trips.id, tripId), eq(trips.userId, userId)))
+      .limit(1);
+
+    if (!trip) {
+      return res.status(404).json({
+        error: {
+          code: 'TRIP_NOT_FOUND',
+          message: 'Trip not found or you do not have permission to view it.'
+        }
+      });
+    }
+
+    // Also fetch stops
+    const stops = await db
+      .select()
+      .from(tripStops)
+      .where(eq(tripStops.tripId, tripId))
+      .orderBy(asc(tripStops.sortOrder));
+
+    return res.status(200).json({
+      data: {
+        ...trip,
+        stops
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching trip by ID:', err);
+    return res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to fetch trip details.'
+      }
+    });
+  }
+};
+
+// GET /api/v1/community/trips & /api/community/trips
+const getCommunityTrips = async (req, res) => {
+  try {
+    const { search, sort = 'createdAt:desc', page = 1, pageSize = 20 } = req.query;
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(pageSize, 10) || 20));
+    const offsetNum = (pageNum - 1) * limitNum;
+
+    const conditions = [eq(trips.isPublic, true)];
+    if (search && search.trim()) {
+      conditions.push(ilike(trips.name, `%${search.trim()}%`));
+    }
+
+    const whereClause = and(...conditions);
+
+    const communityList = await db
+      .select({
+        id: trips.id,
+        name: trips.name,
+        description: trips.description,
+        startDate: trips.startDate,
+        endDate: trips.endDate,
+        coverPhotoUrl: trips.coverPhotoUrl,
+        createdAt: trips.createdAt,
+        ownerFirstName: users.firstName,
+        ownerLastName: users.lastName,
+        ownerUsername: users.username
+      })
+      .from(trips)
+      .leftJoin(users, eq(trips.userId, users.id))
+      .where(whereClause)
+      .orderBy(desc(trips.createdAt))
+      .limit(limitNum)
+      .offset(offsetNum);
+
+    const [countResult] = await db
+      .select({ total: sql`count(*)` })
+      .from(trips)
+      .where(whereClause);
+
+    const total = parseInt(countResult?.total || 0, 10);
+    const totalPages = Math.ceil(total / limitNum);
+
+    const formatted = communityList.map(t => ({
+      id: t.id,
+      name: t.name,
+      description: t.description,
+      startDate: t.startDate,
+      endDate: t.endDate,
+      coverPhotoUrl: t.coverPhotoUrl,
+      createdAt: t.createdAt,
+      ownerDisplayName: `${t.ownerFirstName || ''} ${t.ownerLastName ? t.ownerLastName[0] + '.' : ''}`.trim() || t.ownerUsername || 'GlobeTrotter Traveler'
+    }));
+
+    return res.status(200).json({
+      data: formatted,
+      meta: {
+        page: pageNum,
+        pageSize: limitNum,
+        total,
+        totalPages
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching community trips:', err);
+    return res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to fetch community trips.'
+      }
+    });
+  }
+};
+
+module.exports = {
+  getTrips,
+  createTrip,
+  getTripById,
+  getCommunityTrips
+};
