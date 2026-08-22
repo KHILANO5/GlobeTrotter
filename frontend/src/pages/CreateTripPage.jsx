@@ -35,15 +35,14 @@ export default function CreateTripPage() {
 
   return (
     <div style={{ maxWidth: '780px', margin: '0 auto' }}>
-      <div className="shell-container" style={{ textAlign: 'left', padding: '2rem' }}>
+      <div className="shell-container" style={{ textAlign: 'left', padding: '2.25rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-passive)', paddingBottom: '1rem' }}>
           <div>
-            <span className="shell-badge green">Green Module 1</span>
             <h2>Create Trip</h2>
-            <p className="text-muted text-sm" style={{ margin: 0 }}>Starts a new plan — Next step: Itinerary Builder</p>
+            <p className="text-muted text-sm" style={{ margin: 0 }}>Start a new travel plan — Add stops, activities, and budget</p>
           </div>
           <Link to="/dashboard" className="btn btn-ghost btn-sm">
-            ← Back to Hub
+            ← Back to Dashboard
           </Link>
         </div>
 
@@ -125,13 +124,6 @@ export default function CreateTripPage() {
             </Link>
           </div>
         </form>
-
-        <div className="shell-box" style={{ marginTop: '2.5rem', textAlign: 'center' }}>
-          <h4>💡 Module Info for Team</h4>
-          <p className="text-sm text-muted" style={{ margin: '0.5rem 0 0' }}>
-            This page starts a new travel plan and forwards to the <strong>Itinerary Builder</strong> (<code>/trips/:tripId/builder</code>) to add stops, city searches, and activity selections.
-          </p>
-        </div>
       </div>
     </div>
   );

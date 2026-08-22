@@ -30,12 +30,11 @@ export default function AdminPage() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-          <span className="shell-badge" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#dc2626' }}>Admin Only</span>
           <h2>Admin & Analytics Dashboard</h2>
           <p className="text-muted text-sm">Monitor app adoption, manage users, and view platform metrics</p>
         </div>
         <Link to="/dashboard" className="btn btn-ghost btn-sm">
-          ← Back to Hub
+          ← Back to Dashboard
         </Link>
       </div>
 
@@ -54,9 +53,9 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <div className="dashboard-card" style={{ textAlign: 'left' }}>
-        <div className="card-header">
-          <div className="card-title">Registered User Directory</div>
+      <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-passive)', borderRadius: '12px', padding: '1.5rem', textAlign: 'left' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border-passive)' }}>
+          <div style={{ fontSize: '16px', fontWeight: '600' }}>Registered User Directory</div>
           <span className="nav-badge">Database Records</span>
         </div>
 
@@ -91,14 +90,6 @@ export default function AdminPage() {
             </tbody>
           </table>
         )}
-      </div>
-
-      {/* Team Note Box */}
-      <div className="shell-box" style={{ marginTop: '2.5rem', textAlign: 'center' }}>
-        <h4>💡 Module Info for Team</h4>
-        <p className="text-sm text-muted" style={{ margin: '0.5rem 0 0' }}>
-          This page represents the optional <strong>Admin / Analytics Dashboard (<code>/admin</code>)</strong> for user trends, popular cities, and engagement metrics.
-        </p>
       </div>
     </div>
   );

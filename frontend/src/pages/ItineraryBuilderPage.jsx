@@ -9,7 +9,6 @@ export default function ItineraryBuilderPage() {
       <div className="shell-container" style={{ textAlign: 'left', padding: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-passive)', paddingBottom: '1rem' }}>
           <div>
-            <span className="shell-badge terra">Builder Screen</span>
             <h2>Itinerary Builder</h2>
             <p className="text-muted text-sm" style={{ margin: 0 }}>
               Add stops, select cities, and assign activities to sections
@@ -37,7 +36,7 @@ export default function ItineraryBuilderPage() {
           </div>
         </div>
 
-        {/* Section Blocks Mock Shell */}
+        {/* Section Blocks */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ padding: '1.25rem', backgroundColor: '#ffffff', border: '1px solid var(--border-passive)', borderRadius: '8px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
@@ -56,14 +55,6 @@ export default function ItineraryBuilderPage() {
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Team Note Box */}
-        <div className="shell-box" style={{ marginTop: '2.5rem', textAlign: 'center' }}>
-          <h4>💡 Module Info for Team</h4>
-          <p className="text-sm text-muted" style={{ margin: '0.5rem 0 0' }}>
-            This page represents <strong>Itinerary Builder (Add stops, activities)</strong>. Once stops and activities are saved, the user proceeds to <strong>Itinerary View</strong> (<code>/trips/:tripId/itinerary</code>).
-          </p>
         </div>
       </div>
     </div>

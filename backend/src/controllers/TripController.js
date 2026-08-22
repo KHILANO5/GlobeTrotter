@@ -199,10 +199,22 @@ const getCommunityTrips = async (req, res) => {
 
     const conditions = [eq(trips.isPublic, true)];
     if (search && search.trim()) {
-      conditions.push(ilike(trips.name, `%${search.trim()}%`));
+      const s = `%${search.trim()}%`;
+      conditions.push(or(ilike(trips.name, s), ilike(trips.description, s)));
     }
 
     const whereClause = and(...conditions);
+
+    // Sorting
+    let orderByClause = desc(trips.createdAt);
+    if (sort) {
+      const [field, direction] = sort.split(':');
+      const isAsc = direction === 'asc';
+      if (field === 'startDate') orderByClause = isAsc ? asc(trips.startDate) : desc(trips.startDate);
+      else if (field === 'totalBudget') orderByClause = isAsc ? asc(trips.totalBudget) : desc(trips.totalBudget);
+      else if (field === 'name') orderByClause = isAsc ? asc(trips.name) : desc(trips.name);
+      else if (field === 'createdAt') orderByClause = isAsc ? asc(trips.createdAt) : desc(trips.createdAt);
+    }
 
     const communityList = await db
       .select({
@@ -211,16 +223,22 @@ const getCommunityTrips = async (req, res) => {
         description: trips.description,
         startDate: trips.startDate,
         endDate: trips.endDate,
+        status: trips.status,
+        totalBudget: trips.totalBudget,
         coverPhotoUrl: trips.coverPhotoUrl,
         createdAt: trips.createdAt,
+        ownerId: users.id,
         ownerFirstName: users.firstName,
         ownerLastName: users.lastName,
-        ownerUsername: users.username
+        ownerUsername: users.username,
+        ownerPhotoUrl: users.photoUrl,
+        ownerCity: users.city,
+        ownerCountry: users.country
       })
       .from(trips)
       .leftJoin(users, eq(trips.userId, users.id))
       .where(whereClause)
-      .orderBy(desc(trips.createdAt))
+      .orderBy(orderByClause)
       .limit(limitNum)
       .offset(offsetNum);
 
@@ -232,16 +250,31 @@ const getCommunityTrips = async (req, res) => {
     const total = parseInt(countResult?.total || 0, 10);
     const totalPages = Math.ceil(total / limitNum);
 
-    const formatted = communityList.map(t => ({
-      id: t.id,
-      name: t.name,
-      description: t.description,
-      startDate: t.startDate,
-      endDate: t.endDate,
-      coverPhotoUrl: t.coverPhotoUrl,
-      createdAt: t.createdAt,
-      ownerDisplayName: `${t.ownerFirstName || ''} ${t.ownerLastName ? t.ownerLastName[0] + '.' : ''}`.trim() || t.ownerUsername || 'GlobeTrotter Traveler'
-    }));
+    const formatted = communityList.map(t => {
+      const displayName = `${t.ownerFirstName || ''} ${t.ownerLastName ? t.ownerLastName[0] + '.' : ''}`.trim() || t.ownerUsername || 'GlobeTrotter Traveler';
+      return {
+        id: t.id,
+        name: t.name,
+        description: t.description,
+        startDate: t.startDate,
+        endDate: t.endDate,
+        status: t.status,
+        totalBudget: t.totalBudget,
+        coverPhotoUrl: t.coverPhotoUrl,
+        createdAt: t.createdAt,
+        owner: {
+          id: t.ownerId,
+          firstName: t.ownerFirstName,
+          lastName: t.ownerLastName,
+          username: t.ownerUsername,
+          photoUrl: t.ownerPhotoUrl,
+          city: t.ownerCity,
+          country: t.ownerCountry,
+          displayName
+        },
+        ownerDisplayName: displayName
+      };
+    });
 
     return res.status(200).json({
       data: formatted,

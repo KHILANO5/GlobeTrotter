@@ -11,10 +11,9 @@ export default function ItineraryViewPage() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-passive)', paddingBottom: '1rem' }}>
           <div>
-            <span className="shell-badge hub">Itinerary View (Central Sub-Hub)</span>
             <h2>Itinerary View</h2>
             <p className="text-muted text-sm" style={{ margin: 0 }}>
-              Day-by-day itinerary view — fans out to Budget, Calendar, and Share screens
+              Day-by-day itinerary schedule and activity roadmap
             </p>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -27,7 +26,7 @@ export default function ItineraryViewPage() {
           </div>
         </div>
 
-        {/* Sub-Hub Fan Out Navigation Bar */}
+        {/* Fan Out Navigation Bar */}
         <div 
           style={{ 
             display: 'flex', 
@@ -41,22 +40,22 @@ export default function ItineraryViewPage() {
           }}
         >
           <Link to={tripId ? `/trips/${tripId}/budget` : '/trips/budget'} className="btn btn-secondary btn-sm" style={{ flex: 1, minWidth: '150px' }}>
-            💰 View Budget Breakdown
+            View Budget Breakdown
           </Link>
           <Link to={tripId ? `/trips/${tripId}/calendar` : '/trips/calendar'} className="btn btn-secondary btn-sm" style={{ flex: 1, minWidth: '150px' }}>
-            📅 View Calendar Timeline
+            View Calendar Timeline
           </Link>
           <Link to={tripId ? `/shared/${tripId}` : '/shared/demo'} className="btn btn-secondary btn-sm" style={{ flex: 1, minWidth: '150px' }}>
-            🔗 Share / Public Link
+            Public Share Link
           </Link>
         </div>
 
-        {/* Day-by-Day Mock Preview */}
+        {/* Day-by-Day Preview */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div style={{ padding: '1.5rem', backgroundColor: '#ffffff', border: '1px solid var(--border-passive)', borderRadius: '10px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
               <h4>Day 1: Arrival & City Orientation (Tokyo)</h4>
-              <span className="nav-badge green">Stop: Tokyo</span>
+              <span className="nav-badge" style={{ backgroundColor: 'rgba(13, 92, 70, 0.1)', color: 'var(--accent-green)' }}>Stop: Tokyo</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingLeft: '1rem', borderLeft: '2px solid var(--border-passive)' }}>
               <div className="text-sm">
@@ -69,13 +68,6 @@ export default function ItineraryViewPage() {
           </div>
         </div>
 
-        {/* Team Note Box */}
-        <div className="shell-box" style={{ marginTop: '2.5rem', textAlign: 'center' }}>
-          <h4>💡 Module Info for Team</h4>
-          <p className="text-sm text-muted" style={{ margin: '0.5rem 0 0' }}>
-            As highlighted in your architecture diagram: <strong>"Itinerary view is a hub: Fans out to budget, calendar, and share screens"</strong>. Teammates can build out the full day-wise rendering, drag-and-drop, and cost calculations here.
-          </p>
-        </div>
       </div>
     </div>
   );

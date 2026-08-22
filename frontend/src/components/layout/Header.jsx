@@ -8,60 +8,69 @@ export default function Header({ onMenuClick }) {
 
   // Get active title based on path
   const getPageTitle = (path) => {
-    if (path === '/dashboard') return 'Dashboard Hub';
+    if (path === '/dashboard') return 'Dashboard';
     if (path.startsWith('/trips/new')) return 'Create Trip';
     if (path.startsWith('/trips/builder')) return 'Itinerary Builder';
     if (path.startsWith('/trips/itinerary')) return 'Itinerary View';
     if (path.startsWith('/trips/budget')) return 'Trip Budget & Breakdown';
     if (path.startsWith('/trips/calendar')) return 'Trip Calendar & Timeline';
     if (path === '/trips') return 'My Trips';
-    if (path.startsWith('/community')) return 'Community Travel Plans';
-    if (path.startsWith('/profile')) return 'Profile & Settings';
-    if (path.startsWith('/admin')) return 'Admin & Analytics Dashboard';
+    if (path.startsWith('/community')) return 'Community';
+    if (path.startsWith('/profile')) return 'Profile';
+    if (path.startsWith('/admin')) return 'Admin Dashboard';
     if (path.startsWith('/shared')) return 'Public Itinerary';
     return 'GlobeTrotter';
   };
 
+  const userInitial = user?.firstName?.[0] || user?.fullName?.[0] || user?.email?.[0]?.toUpperCase() || 'U';
+
   return (
     <header className="app-header">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
         <button
           onClick={onMenuClick}
           className="btn btn-ghost btn-sm"
-          style={{ display: 'inline-flex' }}
+          style={{ display: 'inline-flex', padding: '6px 10px', flexShrink: 0 }}
           aria-label="Toggle navigation menu"
         >
-          ☰
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
         </button>
-        <div>
-          <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-charcoal)' }}>
-            {getPageTitle(location.pathname)}
-          </div>
+        <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-charcoal)', whiteSpace: 'nowrap' }}>
+          {getPageTitle(location.pathname)}
         </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-        <Link to="/trips/new" className="btn btn-primary btn-sm">
-          <span>+</span>
-          <span>Plan a Trip</span>
-        </Link>
-        <Link to="/profile" style={{ textDecoration: 'none' }}>
+      <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+        <Link 
+          to="/profile" 
+          style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }} 
+          title="Profile & Settings"
+        >
           <div 
             style={{ 
-              width: '34px', 
-              height: '34px', 
+              width: '36px', 
+              height: '36px', 
+              minWidth: '36px',
+              minHeight: '36px',
+              maxWidth: '36px',
+              maxHeight: '36px',
+              flexShrink: 0,
               borderRadius: '50%', 
-              backgroundColor: 'var(--bg-card)', 
-              border: '1px solid var(--border-passive)',
+              backgroundColor: 'var(--primary-dark)', 
+              color: 'var(--text-on-dark)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '13px',
+              fontSize: '14px',
               fontWeight: '600',
-              color: 'var(--text-charcoal)'
+              boxShadow: 'var(--inset-shadow-dark)'
             }}
           >
-            {user?.firstName?.[0] || user?.fullName?.[0] || 'U'}
+            {userInitial}
           </div>
         </Link>
       </div>
