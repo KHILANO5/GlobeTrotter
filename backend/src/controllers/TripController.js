@@ -263,9 +263,95 @@ const getCommunityTrips = async (req, res) => {
   }
 };
 
+// PUT /api/v1/trips/:tripId
+const updateTrip = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { tripId } = req.params;
+    const { name, description, startDate, endDate, totalBudget, coverPhotoUrl, isPublic } = req.body;
+
+    const [trip] = await db
+      .select()
+      .from(trips)
+      .where(and(eq(trips.id, tripId), eq(trips.userId, userId)))
+      .limit(1);
+
+    if (!trip) {
+      return res.status(404).json({
+        error: { code: 'TRIP_NOT_FOUND', message: 'Trip not found or unauthorized.' }
+      });
+    }
+
+    const updates = { updatedAt: new Date() };
+    if (name !== undefined) updates.name = name.trim();
+    if (description !== undefined) updates.description = description ? description.trim() : null;
+    if (startDate !== undefined) updates.startDate = startDate;
+    if (endDate !== undefined) updates.endDate = endDate;
+    if (totalBudget !== undefined) updates.totalBudget = totalBudget ? String(totalBudget) : null;
+    if (coverPhotoUrl !== undefined) updates.coverPhotoUrl = coverPhotoUrl;
+    if (isPublic !== undefined) updates.isPublic = isPublic;
+
+    // Recalculate status if dates changed
+    const sDate = updates.startDate ? new Date(updates.startDate) : new Date(trip.startDate);
+    const eDate = updates.endDate ? new Date(updates.endDate) : new Date(trip.endDate);
+    const now = new Date();
+    if (now >= sDate && now <= eDate) {
+      updates.status = 'ongoing';
+    } else if (now > eDate) {
+      updates.status = 'completed';
+    } else {
+      updates.status = 'upcoming';
+    }
+
+    const [updated] = await db
+      .update(trips)
+      .set(updates)
+      .where(eq(trips.id, tripId))
+      .returning();
+
+    return res.status(200).json({ data: updated });
+  } catch (err) {
+    console.error('Error updating trip:', err);
+    return res.status(500).json({
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to update trip.' }
+    });
+  }
+};
+
+// DELETE /api/v1/trips/:tripId
+const deleteTrip = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { tripId } = req.params;
+
+    const [trip] = await db
+      .select()
+      .from(trips)
+      .where(and(eq(trips.id, tripId), eq(trips.userId, userId)))
+      .limit(1);
+
+    if (!trip) {
+      return res.status(404).json({
+        error: { code: 'TRIP_NOT_FOUND', message: 'Trip not found or unauthorized.' }
+      });
+    }
+
+    await db.delete(trips).where(eq(trips.id, tripId));
+    return res.status(204).send();
+  } catch (err) {
+    console.error('Error deleting trip:', err);
+    return res.status(500).json({
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to delete trip.' }
+    });
+  }
+};
+
 module.exports = {
   getTrips,
   createTrip,
   getTripById,
+  updateTrip,
+  deleteTrip,
   getCommunityTrips
 };
+

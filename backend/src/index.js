@@ -1,11 +1,19 @@
 const express = require('express');
 const cors = require('cors');
 const { pool } = require('./config/db');
+
+// Route modules
 const authRoutes = require('./routes/authRoutes');
 const cityRoutes = require('./routes/cityRoutes');
 const tripRoutes = require('./routes/tripRoutes');
+const itineraryRoutes = require('./routes/itineraryRoutes');
+const activityRoutes = require('./routes/activityRoutes');
+const budgetRoutes = require('./routes/budgetRoutes');
+const calendarRoutes = require('./routes/calendarRoutes');
+const shareRoutes = require('./routes/shareRoutes');
 const userRoutes = require('./routes/userRoutes');
 const communityRoutes = require('./routes/communityRoutes');
+
 require('dotenv').config();
 
 const app = express();
@@ -15,15 +23,31 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// API v1 & legacy endpoints
+// API v1 & legacy route mountings
 app.use('/api/v1/auth', authRoutes);
-app.use('/api', authRoutes); // supports legacy /api/login, /api/register, etc.
+app.use('/api', authRoutes);
 
 app.use('/api/v1/cities', cityRoutes);
 app.use('/api/cities', cityRoutes);
 
+app.use('/api/v1/activities', activityRoutes);
+app.use('/api/activities', activityRoutes);
+
 app.use('/api/v1/trips', tripRoutes);
 app.use('/api/trips', tripRoutes);
+
+// Nested trip sub-routes (Itinerary, Budget, Calendar, Activities)
+app.use('/api/v1/trips/:tripId', itineraryRoutes);
+app.use('/api/trips/:tripId', itineraryRoutes);
+
+app.use('/api/v1/trips/:tripId', budgetRoutes);
+app.use('/api/trips/:tripId', budgetRoutes);
+
+app.use('/api/v1/trips/:tripId', calendarRoutes);
+app.use('/api/trips/:tripId', calendarRoutes);
+
+app.use('/api/v1/shared', shareRoutes);
+app.use('/api/shared', shareRoutes);
 
 app.use('/api/v1/users', userRoutes);
 app.use('/api/users', userRoutes);
