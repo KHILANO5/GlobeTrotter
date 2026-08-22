@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -36,12 +36,27 @@ export default function DashboardPage() {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showGroupDropdown, setShowGroupDropdown] = useState(false);
 
+  const controlsRef = useRef(null);
+
+  // Close dropdowns on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (controlsRef.current && !controlsRef.current.contains(e.target)) {
+        setShowFilterDropdown(false);
+        setShowSortDropdown(false);
+        setShowGroupDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
         // Fetch top regional selection cities from live PostgreSQL DB
-        const citiesRes = await api.get('/cities?pageSize=15&sort=popularityScore:desc');
+        const citiesRes = await api.get('/cities?pageSize=20&sort=popularityScore:desc');
         if (citiesRes.data) {
           setCities(citiesRes.data);
         }
@@ -126,7 +141,7 @@ export default function DashboardPage() {
       </div>
 
       {/* 2. Search Bar, Group by, Filter, Sort by Controls (Wireframe Component 2) */}
-      <div className="dashboard-controls-bar">
+      <div className="dashboard-controls-bar" ref={controlsRef}>
         
         {/* Search input field */}
         <div className="search-input-wrapper">
@@ -141,6 +156,15 @@ export default function DashboardPage() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => setSearchTerm('')}
+              style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
+            >
+              ✕
+            </button>
+          )}
         </div>
 
         {/* Filter / Group / Sort Actions */}
@@ -167,12 +191,12 @@ export default function DashboardPage() {
                   position: 'absolute',
                   top: '110%',
                   left: 0,
-                  backgroundColor: 'var(--bg-card)',
+                  backgroundColor: '#ffffff',
                   border: '1px solid var(--border-passive)',
                   borderRadius: '8px',
-                  boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
+                  boxShadow: '0 6px 18px rgba(0,0,0,0.12)',
                   padding: '6px',
-                  zIndex: 20,
+                  zIndex: 40,
                   minWidth: '150px'
                 }}
               >
@@ -225,12 +249,12 @@ export default function DashboardPage() {
                   position: 'absolute',
                   top: '110%',
                   left: 0,
-                  backgroundColor: 'var(--bg-card)',
+                  backgroundColor: '#ffffff',
                   border: '1px solid var(--border-passive)',
                   borderRadius: '8px',
-                  boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
+                  boxShadow: '0 6px 18px rgba(0,0,0,0.12)',
                   padding: '6px',
-                  zIndex: 20,
+                  zIndex: 40,
                   minWidth: '160px'
                 }}
               >
@@ -283,12 +307,12 @@ export default function DashboardPage() {
                   position: 'absolute',
                   top: '110%',
                   right: 0,
-                  backgroundColor: 'var(--bg-card)',
+                  backgroundColor: '#ffffff',
                   border: '1px solid var(--border-passive)',
                   borderRadius: '8px',
-                  boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
+                  boxShadow: '0 6px 18px rgba(0,0,0,0.12)',
                   padding: '6px',
-                  zIndex: 20,
+                  zIndex: 40,
                   minWidth: '160px'
                 }}
               >
@@ -337,7 +361,7 @@ export default function DashboardPage() {
           <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
             Loading top regional destinations...
           </div>
-        ) : (
+        ) : filteredCities.length > 0 ? (
           <div className="regional-selections-grid">
             {filteredCities.map(city => {
               const imgUrl = CITY_IMAGES[city.name] || city.imageUrl || CITY_IMAGES.default;
@@ -348,7 +372,14 @@ export default function DashboardPage() {
                   className="regional-card"
                   title={`Plan a trip to ${city.name}`}
                 >
-                  <img src={imgUrl} alt={city.name} className="regional-card-img" />
+                  <img
+                    src={imgUrl}
+                    alt={city.name}
+                    className="regional-card-img"
+                    onError={(e) => {
+                      e.target.src = CITY_IMAGES.default;
+                    }}
+                  />
                   <div className="regional-card-body">
                     <div>
                       <div className="regional-card-name">{city.name}</div>
@@ -362,6 +393,12 @@ export default function DashboardPage() {
                 </Link>
               );
             })}
+          </div>
+        ) : (
+          <div className="shell-container" style={{ padding: '2rem', textAlign: 'center' }}>
+            <p className="text-muted text-sm" style={{ margin: 0 }}>
+              No destinations found matching "{searchTerm}".
+            </p>
           </div>
         )}
       </div>
@@ -386,9 +423,12 @@ export default function DashboardPage() {
                 className="previous-trip-card"
               >
                 <img
-                  src={trip.coverPhotoUrl || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&auto=format&fit=crop&q=80'}
+                  src={trip.coverPhotoUrl || CITY_IMAGES.default}
                   alt={trip.name}
                   className="trip-card-cover"
+                  onError={(e) => {
+                    e.target.src = CITY_IMAGES.default;
+                  }}
                 />
                 <div className="trip-card-content">
                   <div>
@@ -410,7 +450,7 @@ export default function DashboardPage() {
 
                   <div className="trip-card-bottom">
                     <span className="trip-card-budget">
-                      {trip.totalBudget ? `$${trip.totalBudget}` : 'Budget unset'}
+                      {trip.totalBudget ? `$${parseFloat(trip.totalBudget).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Budget unset'}
                     </span>
                     <span style={{ fontWeight: '500', color: 'var(--text-charcoal)' }}>
                       View Plan →
