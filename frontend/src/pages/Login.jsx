@@ -18,12 +18,8 @@ function Login() {
     setError('');
     setLoading(true);
     try {
-      const loggedUser = await login(email, password);
-      if (loggedUser.role === 'ADMIN') {
-        navigate('/admin-dashboard');
-      } else {
-        navigate('/dashboard');
-      }
+      await login(email, password);
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.');
       if (err.message && err.message.includes('verify your email')) {
