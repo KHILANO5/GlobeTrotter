@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -30,9 +29,8 @@ export default function ProfilePage() {
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-          <span className="shell-badge green">Green Module 4</span>
           <h2>User Profile & Settings</h2>
-          <p className="text-muted text-sm">Account settings — Personal info, preferences, and saved destinations</p>
+          <p className="text-muted text-sm">Account settings, travel statistics, and profile information</p>
         </div>
         <button onClick={logout} className="btn btn-secondary btn-sm">
           Sign Out
@@ -58,8 +56,8 @@ export default function ProfilePage() {
                   color: 'var(--text-on-dark)', 
                   display: 'flex', 
                   alignItems: 'center', 
-                  justifyContent: 'center',
-                  fontSize: '24px',
+                  justifyContent: 'center', 
+                  fontSize: '24px', 
                   fontWeight: '600'
                 }}
               >
@@ -70,7 +68,7 @@ export default function ProfilePage() {
                 <p className="text-sm text-muted" style={{ margin: '0.25rem 0 0' }}>{profile?.email || user?.email}</p>
                 <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem' }}>
                   <span className="nav-badge" style={{ textTransform: 'uppercase' }}>{profile?.role || user?.role || 'user'}</span>
-                  <span className="nav-badge green">Verified</span>
+                  <span className="nav-badge" style={{ backgroundColor: 'rgba(13, 92, 70, 0.1)', color: 'var(--accent-green)' }}>Verified</span>
                 </div>
               </div>
             </div>
@@ -89,11 +87,11 @@ export default function ProfilePage() {
 
             {/* Details Table */}
             <div>
-              <h4 style={{ marginBottom: '0.75rem' }}>Database Account Parameters</h4>
+              <h4 style={{ marginBottom: '0.75rem' }}>Account Information</h4>
               <table className="db-details-table">
                 <tbody>
                   <tr>
-                    <td style={{ width: '180px', color: 'var(--text-muted)' }}>Database UUID</td>
+                    <td style={{ width: '180px', color: 'var(--text-muted)' }}>Account ID</td>
                     <td style={{ fontFamily: 'monospace', fontSize: '13px' }}>{profile?.id || user?.id}</td>
                   </tr>
                   <tr>
@@ -105,7 +103,7 @@ export default function ProfilePage() {
                     <td style={{ textTransform: 'uppercase' }}>{profile?.languagePreference || 'en'}</td>
                   </tr>
                   <tr>
-                    <td style={{ color: 'var(--text-muted)' }}>Account Created</td>
+                    <td style={{ color: 'var(--text-muted)' }}>Member Since</td>
                     <td>{profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString() : '—'}</td>
                   </tr>
                 </tbody>
@@ -114,14 +112,6 @@ export default function ProfilePage() {
 
           </div>
         )}
-
-        {/* Team Note Box */}
-        <div className="shell-box" style={{ marginTop: '2.5rem', textAlign: 'center' }}>
-          <h4>💡 Module Info for Team</h4>
-          <p className="text-sm text-muted" style={{ margin: '0.5rem 0 0' }}>
-            This page represents <strong>User Profile / Settings (Account settings)</strong>. If the user has admin credentials, the navigation connects to the <strong>Admin Dashboard</strong> (<code>/admin</code>).
-          </p>
-        </div>
       </div>
     </div>
   );

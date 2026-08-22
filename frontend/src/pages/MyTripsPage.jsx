@@ -31,9 +31,8 @@ export default function MyTripsPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-          <span className="shell-badge green">Green Module 2</span>
           <h2>My Trips</h2>
-          <p className="text-muted text-sm">List of user trips — Click any trip to open its Itinerary View</p>
+          <p className="text-muted text-sm">All your personalized travel plans, itineraries, and past journeys</p>
         </div>
         <Link to="/trips/new" className="btn btn-primary">
           + Plan a New Trip
@@ -106,14 +105,6 @@ export default function MyTripsPage() {
           </Link>
         </div>
       )}
-
-      {/* Team Note Box */}
-      <div className="shell-box" style={{ marginTop: '3rem', textAlign: 'center' }}>
-        <h4>💡 Module Info for Team</h4>
-        <p className="text-sm text-muted" style={{ margin: '0.5rem 0 0' }}>
-          This page represents <strong>My Trips (Trip List)</strong>. Clicking a trip card opens its <strong>Itinerary View</strong> (<code>/trips/:tripId/itinerary</code>) or <strong>Itinerary Builder</strong> (<code>/trips/:tripId/builder</code>).
-        </p>
-      </div>
     </div>
   );
 }

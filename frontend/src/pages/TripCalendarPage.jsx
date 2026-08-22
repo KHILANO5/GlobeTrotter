@@ -61,6 +61,11 @@ export default function TripCalendarPage() {
       <div style={{ backgroundColor: '#ffffff', padding: '1.75rem', borderRadius: '12px', border: '1px solid var(--border-passive)', marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
+<<<<<<< HEAD
+            <h2>Trip Calendar & Timeline</h2>
+            <p className="text-muted text-sm" style={{ margin: 0 }}>
+              Visual timeline and day-by-day scheduling view
+=======
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.35rem' }}>
               <span className="shell-badge hub">Timeline Visualization</span>
               <span className="nav-badge green">{days.length} Days</span>
@@ -68,9 +73,24 @@ export default function TripCalendarPage() {
             <h2 style={{ margin: '0.25rem 0' }}>{tripName} — Calendar & Timeline</h2>
             <p className="text-sm text-muted" style={{ margin: 0 }}>
               📅 {new Date(startDate).toLocaleDateString()} – {new Date(endDate).toLocaleDateString()} • {totalActivities} Scheduled Events
+>>>>>>> bb4224b4a0f25d6339e9ba76c6930bbf3ead484e
             </p>
           </div>
 
+<<<<<<< HEAD
+        <div style={{ padding: '2.5rem', backgroundColor: 'var(--bg-page)', borderRadius: '10px', border: '1px dashed var(--border-passive)', textAlign: 'center' }}>
+          <div style={{ fontSize: '32px', marginBottom: '0.75rem' }}>📅</div>
+          <h4>Interactive Calendar & Timeline Grid</h4>
+          <p className="text-sm text-muted" style={{ maxWidth: '480px', margin: '0.5rem auto 1.5rem' }}>
+            Multi-day stops, activity blocks, and visual scheduling timeline.
+          </p>
+          <div style={{ display: 'inline-flex', gap: '0.5rem' }}>
+            <span className="nav-badge">Month View</span>
+            <span className="nav-badge">Week View</span>
+            <span className="nav-badge" style={{ backgroundColor: 'rgba(13, 92, 70, 0.1)', color: 'var(--accent-green)' }}>Timeline View</span>
+          </div>
+        </div>
+=======
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <Link to={`/trips/${tripId}/builder`} className="btn btn-secondary btn-sm">
               ✏️ Builder
@@ -157,6 +177,7 @@ export default function TripCalendarPage() {
             </div>
           </div>
         ))}
+>>>>>>> bb4224b4a0f25d6339e9ba76c6930bbf3ead484e
       </div>
     </div>
   );

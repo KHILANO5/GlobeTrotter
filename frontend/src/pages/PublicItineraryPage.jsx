@@ -90,6 +90,11 @@ export default function PublicItineraryPage() {
       <div style={{ backgroundColor: '#ffffff', padding: '2rem', borderRadius: '12px', border: '1px solid var(--border-passive)', marginBottom: '1.75rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
+<<<<<<< HEAD
+            <h2>Shared Public Itinerary</h2>
+            <p className="text-muted text-sm" style={{ margin: 0 }}>
+              Read-only public trip page with "Copy Trip" feature
+=======
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.4rem' }}>
               <span className="shell-badge green">Public Shared Itinerary</span>
               <span className="nav-badge">Shared by {ownerDisplayName}</span>
@@ -97,6 +102,7 @@ export default function PublicItineraryPage() {
             <h1 style={{ margin: '0.25rem 0', fontSize: '26px' }}>{tripName}</h1>
             <p className="text-sm text-muted" style={{ margin: 0 }}>
               📅 {new Date(startDate).toLocaleDateString()} – {new Date(endDate).toLocaleDateString()} • {days.length} Days Itinerary
+>>>>>>> bb4224b4a0f25d6339e9ba76c6930bbf3ead484e
             </p>
           </div>
 
@@ -111,6 +117,17 @@ export default function PublicItineraryPage() {
           </button>
         </div>
 
+<<<<<<< HEAD
+        <div style={{ padding: '1.5rem', backgroundColor: '#ffffff', borderRadius: '10px', border: '1px solid var(--border-passive)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h3>Japan Spring Exploration</h3>
+              <p className="text-sm text-muted">Shared by Jane D. • Token: {shareToken || 'demo'}</p>
+            </div>
+            <span className="nav-badge" style={{ backgroundColor: 'rgba(13, 92, 70, 0.1)', color: 'var(--accent-green)' }}>Public Link Active</span>
+          </div>
+        </div>
+=======
         {description && (
           <p className="text-sm" style={{ color: 'var(--text-body)', marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--border-passive)', fontStyle: 'italic' }}>
             "{description}"
@@ -202,6 +219,7 @@ export default function PublicItineraryPage() {
         >
           {copying ? 'Copying...' : '📋 Copy Trip to My Account →'}
         </button>
+>>>>>>> bb4224b4a0f25d6339e9ba76c6930bbf3ead484e
       </div>
     </div>
   );
