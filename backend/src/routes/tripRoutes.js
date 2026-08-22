@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
 const TripController = require('../controllers/TripController');
 const ShareController = require('../controllers/ShareController');
 const { authenticateUser } = require('../middleware/authMiddleware');
 
 router.get('/', authenticateUser, TripController.getTrips);
-router.post('/', authenticateUser, TripController.createTrip);
+router.post('/', authenticateUser, upload.single('coverPhoto'), TripController.createTrip);
 router.get('/:tripId', authenticateUser, TripController.getTripById);
 router.put('/:tripId', authenticateUser, TripController.updateTrip);
 router.delete('/:tripId', authenticateUser, TripController.deleteTrip);
