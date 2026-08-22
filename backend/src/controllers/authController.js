@@ -9,10 +9,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'hackathon_secret_key_123!';
 
 // Register a new user with email verification code
 const register = async (req, res) => {
-  const { fullName, email, password } = req.body;
+  const { fullName, firstName, lastName, username, email, password } = req.body;
 
-  if (!fullName || !email || !password) {
-    return res.status(400).json({ error: 'Full name, email, and password are required.' });
+  if ((!fullName && !firstName) || !email || !password) {
+    return res.status(400).json({ error: 'Name, email, and password are required.' });
   }
 
   try {
@@ -29,21 +29,35 @@ const register = async (req, res) => {
       return res.status(400).json({ error: 'A user with this email already exists.' });
     }
 
+    // Determine first and last name
+    let fName = firstName;
+    let lName = lastName || '';
+    if (!fName && fullName) {
+      const parts = fullName.trim().split(' ');
+      fName = parts[0];
+      lName = parts.slice(1).join(' ') || 'User';
+    }
+    const cleanUsername = username || cleanEmail.split('@')[0] + '_' + Math.floor(Math.random() * 1000);
+
     // Generate a 6-digit verification code
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Insert new unverified user
     const [newUser] = await db.insert(users).values({
-      fullName: fullName.trim(),
+      firstName: fName || 'Traveler',
+      lastName: lName || '',
+      username: cleanUsername,
       email: cleanEmail,
-      password: hashedPassword,
-      role: 'USER',
+      passwordHash: hashedPassword,
+      role: 'user',
       isVerified: false,
       verificationCode: verificationCode
     }).returning({
       id: users.id,
-      fullName: users.fullName,
+      firstName: users.firstName,
+      lastName: users.lastName,
+      username: users.username,
       email: users.email,
       role: users.role,
       isVerified: users.isVerified,
@@ -55,7 +69,10 @@ const register = async (req, res) => {
 
     return res.status(201).json({
       message: 'Registration successful! A 6-digit OTP code has been sent to your email.',
-      user: newUser
+      user: {
+        ...newUser,
+        fullName: `${newUser.firstName} ${newUser.lastName}`.trim()
+      }
       // Security: verificationCode is NOT returned in response payload
     });
   } catch (err) {
@@ -86,8 +103,9 @@ const login = async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
-    // Compare passwords
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Compare passwords with passwordHash
+    const passHash = user.passwordHash || user.password;
+    const isMatch = await bcrypt.compare(password, passHash);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
@@ -112,12 +130,29 @@ const login = async (req, res) => {
       { expiresIn: '8h' }
     );
 
+    const displayName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || user.email;
+
     return res.status(200).json({
       message: 'Login successful!',
       token,
+      data: {
+        user: {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          username: user.username,
+          fullName: displayName,
+          email: user.email,
+          role: user.role
+        },
+        token
+      },
       user: {
         id: user.id,
-        fullName: user.fullName,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        fullName: displayName,
         email: user.email,
         role: user.role
       }
@@ -271,9 +306,17 @@ const getProfile = async (req, res) => {
     const [user] = await db
       .select({
         id: users.id,
-        fullName: users.fullName,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        username: users.username,
         email: users.email,
+        phoneNumber: users.phoneNumber,
+        city: users.city,
+        country: users.country,
+        photoUrl: users.photoUrl,
+        languagePreference: users.languagePreference,
         role: users.role,
+        isVerified: users.isVerified,
         createdAt: users.createdAt
       })
       .from(users)
@@ -284,7 +327,18 @@ const getProfile = async (req, res) => {
       return res.status(404).json({ error: 'User not found.' });
     }
 
-    return res.json({ user });
+    const displayName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || user.email;
+
+    return res.json({
+      data: {
+        ...user,
+        fullName: displayName
+      },
+      user: {
+        ...user,
+        fullName: displayName
+      }
+    });
   } catch (err) {
     console.error('Profile retrieval error:', err.message);
     return res.status(500).json({ error: 'Server error retrieving user profile.' });
@@ -297,7 +351,9 @@ const getAdminDashboard = async (req, res) => {
     const usersCountResult = await db.select({ count: sql`count(*)` }).from(users);
     const usersList = await db.select({
       id: users.id,
-      fullName: users.fullName,
+      firstName: users.firstName,
+      lastName: users.lastName,
+      username: users.username,
       email: users.email,
       role: users.role,
       isVerified: users.isVerified,
@@ -305,10 +361,22 @@ const getAdminDashboard = async (req, res) => {
     }).from(users);
 
     return res.json({
+      data: {
+        stats: {
+          totalUsers: Number(usersCountResult[0].count),
+        },
+        users: usersList.map(u => ({
+          ...u,
+          fullName: `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.username
+        }))
+      },
       stats: {
         totalUsers: Number(usersCountResult[0].count),
       },
-      users: usersList
+      users: usersList.map(u => ({
+        ...u,
+        fullName: `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.username
+      }))
     });
   } catch (err) {
     console.error('Admin dashboard retrieval error:', err.message);
