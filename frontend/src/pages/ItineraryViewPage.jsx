@@ -65,11 +65,6 @@ export default function ItineraryViewPage() {
       <div style={{ backgroundColor: '#ffffff', padding: '1.75rem', borderRadius: '12px', border: '1px solid var(--border-passive)', marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-passive)', paddingBottom: '1.25rem', marginBottom: '1.25rem' }}>
           <div>
-<<<<<<< HEAD
-            <h2>Itinerary View</h2>
-            <p className="text-muted text-sm" style={{ margin: 0 }}>
-              Day-by-day itinerary schedule and activity roadmap
-=======
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.35rem' }}>
               <span className="shell-badge hub">Central Sub-Hub</span>
               <span className="nav-badge green">{days.length} Days Itinerary</span>
@@ -79,7 +74,6 @@ export default function ItineraryViewPage() {
               📅 {new Date(startDate).toLocaleDateString()} – {new Date(endDate).toLocaleDateString()}
               {stops.length > 0 && ` • ${stops.length} Stops / Sections`}
               {totalActivitiesCount > 0 && ` • ${totalActivitiesCount} Experiences`}
->>>>>>> bb4224b4a0f25d6339e9ba76c6930bbf3ead484e
             </p>
           </div>
 
@@ -97,11 +91,7 @@ export default function ItineraryViewPage() {
           </div>
         </div>
 
-<<<<<<< HEAD
-        {/* Fan Out Navigation Bar */}
-=======
         {/* Sub-Hub Fan-Out Action Bar (Matches architecture diagram) */}
->>>>>>> bb4224b4a0f25d6339e9ba76c6930bbf3ead484e
         <div 
           style={{ 
             display: 'grid', 
@@ -113,16 +103,6 @@ export default function ItineraryViewPage() {
             borderRadius: '8px',
           }}
         >
-<<<<<<< HEAD
-          <Link to={tripId ? `/trips/${tripId}/budget` : '/trips/budget'} className="btn btn-secondary btn-sm" style={{ flex: 1, minWidth: '150px' }}>
-            View Budget Breakdown
-          </Link>
-          <Link to={tripId ? `/trips/${tripId}/calendar` : '/trips/calendar'} className="btn btn-secondary btn-sm" style={{ flex: 1, minWidth: '150px' }}>
-            View Calendar Timeline
-          </Link>
-          <Link to={tripId ? `/shared/${tripId}` : '/shared/demo'} className="btn btn-secondary btn-sm" style={{ flex: 1, minWidth: '150px' }}>
-            Public Share Link
-=======
           <Link to={`/trips/${tripId}/budget`} className="btn btn-secondary btn-sm" style={{ textAlign: 'center' }}>
             💰 Budget & Breakdown
           </Link>
@@ -138,31 +118,10 @@ export default function ItineraryViewPage() {
           </button>
           <Link to={`/trips/${tripId}/builder`} className="btn btn-ghost btn-sm" style={{ textAlign: 'center' }}>
             ➕ Add More Stops
->>>>>>> bb4224b4a0f25d6339e9ba76c6930bbf3ead484e
           </Link>
         </div>
       </div>
 
-<<<<<<< HEAD
-        {/* Day-by-Day Preview */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          <div style={{ padding: '1.5rem', backgroundColor: '#ffffff', border: '1px solid var(--border-passive)', borderRadius: '10px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-              <h4>Day 1: Arrival & City Orientation (Tokyo)</h4>
-              <span className="nav-badge" style={{ backgroundColor: 'rgba(13, 92, 70, 0.1)', color: 'var(--accent-green)' }}>Stop: Tokyo</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingLeft: '1rem', borderLeft: '2px solid var(--border-passive)' }}>
-              <div className="text-sm">
-                <strong>09:00 AM:</strong> Senso-ji Temple exploration & street food
-              </div>
-              <div className="text-sm">
-                <strong>02:00 PM:</strong> Shibuya Crossing & Shopping
-              </div>
-            </div>
-          </div>
-        </div>
-
-=======
       {/* Embedded Budget Highlights Banner */}
       <div 
         style={{ 
@@ -208,7 +167,6 @@ export default function ItineraryViewPage() {
         <Link to={`/trips/${tripId}/budget`} className="btn btn-secondary btn-sm">
           Full Budget Details →
         </Link>
->>>>>>> bb4224b4a0f25d6339e9ba76c6930bbf3ead484e
       </div>
 
       {/* Day-by-Day Itinerary Layout */}
