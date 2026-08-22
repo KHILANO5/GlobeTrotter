@@ -130,6 +130,16 @@ const createTrip = async (req, res) => {
       });
     }
 
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (startDate < todayStr) {
+      return res.status(422).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Start date cannot be in the past. Please select today or a future date.'
+        }
+      });
+    }
+
     if (end < start) {
       return res.status(422).json({
         error: {

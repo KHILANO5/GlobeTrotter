@@ -56,6 +56,10 @@ export default function CreateTripPage() {
       return { valid: false, text: 'Invalid date format' };
     }
 
+    if (formData.startDate < today) {
+      return { valid: false, text: 'Start date cannot be in the past' };
+    }
+
     if (end < start) {
       return { valid: false, text: 'End date cannot be earlier than start date' };
     }
@@ -71,7 +75,7 @@ export default function CreateTripPage() {
     }
 
     return { valid: true, text: `${diffDays} Days / ${diffDays - 1} Nights`, days: diffDays };
-  }, [formData.startDate, formData.endDate]);
+  }, [formData.startDate, formData.endDate, today]);
 
   // Handle Input Changes & Clear Specific Field Error
   const handleChange = (field, value) => {
@@ -126,10 +130,14 @@ export default function CreateTripPage() {
     // 2. Dates
     if (!formData.startDate) {
       errors.startDate = 'Start date is required.';
+    } else if (formData.startDate < today) {
+      errors.startDate = 'Start date cannot be in the past. Please select today or a future date.';
     }
+
     if (!formData.endDate) {
       errors.endDate = 'End date is required.';
     }
+
     if (formData.startDate && formData.endDate) {
       const start = new Date(formData.startDate);
       const end = new Date(formData.endDate);
@@ -141,7 +149,7 @@ export default function CreateTripPage() {
         errors.endDate = 'Invalid end date.';
       }
       if (end < start) {
-        errors.endDate = 'End date must be on or after start date.';
+        errors.endDate = 'End date cannot be earlier than start date (duration cannot be negative).';
       } else {
         const diffDays = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
         if (diffDays > 365) {
@@ -296,9 +304,16 @@ export default function CreateTripPage() {
               <input
                 id="startDate"
                 type="date"
+                min={today}
                 className={`input-field ${fieldErrors.startDate ? 'input-error' : ''}`}
                 value={formData.startDate}
-                onChange={e => handleChange('startDate', e.target.value)}
+                onChange={e => {
+                  const newStart = e.target.value;
+                  handleChange('startDate', newStart);
+                  if (formData.endDate && formData.endDate < newStart) {
+                    handleChange('endDate', newStart);
+                  }
+                }}
                 required
               />
               {fieldErrors.startDate && (
