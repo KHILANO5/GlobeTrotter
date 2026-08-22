@@ -182,12 +182,13 @@ export default function CreateTripPage() {
       }
     }
 
-    // 4. Cover Photo URL
+    // 4. Cover Photo URL Validation
     if (formData.coverPhotoUrl && formData.coverPhotoUrl.trim()) {
       const url = formData.coverPhotoUrl.trim();
       const isHttp = /^https?:\/\//i.test(url);
       const isData = url.startsWith('data:image/');
-      if (!isHttp && !isData) {
+      const isBlob = url.startsWith('blob:');
+      if (!isHttp && !isData && !isBlob) {
         errors.coverPhotoUrl = 'Please enter a valid URL starting with http:// or https://';
       }
     }

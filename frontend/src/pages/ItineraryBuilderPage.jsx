@@ -213,6 +213,8 @@ export default function ItineraryBuilderPage() {
     }
   };
 
+  const isCompleted = trip?.status?.toLowerCase() === 'completed';
+
   return (
     <div style={{ maxWidth: '960px', margin: '0 auto', display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 120px)' }}>
       
@@ -232,6 +234,11 @@ export default function ItineraryBuilderPage() {
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.35rem' }}>
               <span className="shell-badge terra">Builder Mode</span>
               <span className="nav-badge" style={{ textTransform: 'capitalize' }}>{trip.status}</span>
+              {isCompleted && (
+                <span style={{ fontSize: '12px', color: '#dc2626', fontWeight: '500', marginLeft: '4px' }}>
+                  (Read-only)
+                </span>
+              )}
             </div>
             <h2 style={{ margin: '0 0 0.25rem 0' }}>{trip.name}</h2>
             <p className="text-sm text-muted" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
@@ -244,15 +251,17 @@ export default function ItineraryBuilderPage() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button
-              type="button"
-              className="btn btn-primary btn-sm"
-              onClick={() => setIsCityModalOpen(true)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-            >
-              <PlusIcon size={14} />
-              <span>Add Stop / Section</span>
-            </button>
+            {!isCompleted && (
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={() => setIsCityModalOpen(true)}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                <PlusIcon size={14} />
+                <span>Add Stop / Section</span>
+              </button>
+            )}
             <Link to={`/trips/${tripId}/itinerary`} className="btn btn-secondary btn-sm">
               Itinerary View →
             </Link>
@@ -270,7 +279,7 @@ export default function ItineraryBuilderPage() {
             </p>
           </div>
 
-          {stops.length > 0 && (
+          {stops.length > 0 && !isCompleted && (
             <button
               type="button"
               className="btn btn-secondary btn-sm"
@@ -292,15 +301,17 @@ export default function ItineraryBuilderPage() {
             <p className="text-muted text-sm" style={{ maxWidth: '460px', margin: '0 auto 1.5rem' }}>
               Your journey is waiting to be built! Add your first destination city or travel leg to begin planning activities.
             </p>
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => setIsCityModalOpen(true)}
-              style={{ padding: '10px 20px', fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-            >
-              <PlusIcon size={14} />
-              <span>Add First Destination Stop</span>
-            </button>
+            {!isCompleted && (
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => setIsCityModalOpen(true)}
+                style={{ padding: '10px 20px', fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                <PlusIcon size={14} />
+                <span>Add First Destination Stop</span>
+              </button>
+            )}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -341,37 +352,39 @@ export default function ItineraryBuilderPage() {
                   </div>
 
                   {/* Stop Reordering & Action Controls */}
-                  <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
-                      style={{ padding: '4px 8px', fontSize: '12px' }}
-                      disabled={index === 0}
-                      onClick={() => handleMoveStop(index, -1)}
-                      title="Move Up"
-                    >
-                      ▲
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
-                      style={{ padding: '4px 8px', fontSize: '12px' }}
-                      disabled={index === stops.length - 1}
-                      onClick={() => handleMoveStop(index, 1)}
-                      title="Move Down"
-                    >
-                      ▼
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
-                      style={{ padding: '4px 8px', color: '#dc2626', fontSize: '14px' }}
-                      onClick={() => handleDeleteStop(stop.id)}
-                      title="Delete Stop"
-                    >
-                      ✕
-                    </button>
-                  </div>
+                  {!isCompleted && (
+                    <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        style={{ padding: '4px 8px', fontSize: '12px' }}
+                        disabled={index === 0}
+                        onClick={() => handleMoveStop(index, -1)}
+                        title="Move Up"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        style={{ padding: '4px 8px', fontSize: '12px' }}
+                        disabled={index === stops.length - 1}
+                        onClick={() => handleMoveStop(index, 1)}
+                        title="Move Down"
+                      >
+                        ▼
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        style={{ padding: '4px 8px', color: '#dc2626', fontSize: '14px' }}
+                        onClick={() => handleDeleteStop(stop.id)}
+                        title="Delete Stop"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {stop.description && (
@@ -386,15 +399,17 @@ export default function ItineraryBuilderPage() {
                     <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-charcoal)' }}>
                       Activities & Experiences ({stop.activities?.length || 0})
                     </span>
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-sm"
-                      style={{ fontSize: '12px', padding: '5px 12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                      onClick={() => handleOpenActivityModal(stop)}
-                    >
-                      <PlusIcon size={12} />
-                      <span>Assign Activity</span>
-                    </button>
+                    {!isCompleted && (
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        style={{ fontSize: '12px', padding: '5px 12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                        onClick={() => handleOpenActivityModal(stop)}
+                      >
+                        <PlusIcon size={12} />
+                        <span>Assign Activity</span>
+                      </button>
+                    )}
                   </div>
 
                   {stop.activities && stop.activities.length > 0 ? (
@@ -429,14 +444,16 @@ export default function ItineraryBuilderPage() {
                             <span style={{ fontWeight: '700', fontSize: '13px', color: 'var(--accent-green)' }}>
                               {parseFloat(act.cost) === 0 ? 'Free' : `$${parseFloat(act.cost).toFixed(2)}`}
                             </span>
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveActivity(stop.id, act.id)}
-                              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: '14px', padding: '2px 6px' }}
-                              title="Remove activity"
-                            >
-                              ✕
-                            </button>
+                            {!isCompleted && (
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveActivity(stop.id, act.id)}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: '14px', padding: '2px 6px' }}
+                                title="Remove activity"
+                              >
+                                ✕
+                              </button>
+                            )}
                           </div>
                         </div>
                       ))}
