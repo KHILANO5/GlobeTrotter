@@ -949,3 +949,118 @@ p {
   border-color: rgba(28, 28, 28, 0.6);
   box-shadow: var(--ring-blue) 0px 0px 0px 2px;
 }
+
+/* ==========================================================================
+   Admin Panel (Screen 12) Styles
+   ========================================================================== */
+.admin-tab-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1.25rem 0 1.5rem 0;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.admin-tab-btn {
+  padding: 8px 18px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-passive);
+  border-radius: 20px;
+  font-family: var(--font-system);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-charcoal);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.admin-tab-btn:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--border-interactive);
+}
+
+.admin-tab-btn.active {
+  background-color: var(--primary-dark);
+  color: var(--text-on-dark);
+  border-color: var(--primary-dark);
+  box-shadow: var(--inset-shadow-dark);
+}
+
+.admin-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-metric-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-passive);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin-chart-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-passive);
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-charts-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 900px) {
+  .admin-charts-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.admin-item-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-passive);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.15s ease;
+}
+
+.admin-item-card:hover {
+  border-color: var(--border-interactive);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.admin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.admin-modal-box {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-passive);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 680px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 1.75rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
