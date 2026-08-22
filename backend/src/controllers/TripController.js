@@ -1,6 +1,7 @@
 const { db } = require('../config/db');
 const { trips, tripStops, users, tripShares, tripStopActivities, tripCopies } = require('../db/schema');
 const { eq, desc, asc, and, ilike, sql, or, isNull } = require('drizzle-orm');
+const imagekit = require('../services/imagekit');
 
 // GET /api/v1/trips & /api/trips
 const getTrips = async (req, res) => {
@@ -184,7 +185,15 @@ const createTrip = async (req, res) => {
 
     // 4. Cover Photo URL Validation
     let sanitizedPhotoUrl = null;
-    if (coverPhotoUrl && typeof coverPhotoUrl === 'string' && coverPhotoUrl.trim()) {
+    
+    if (req.file) {
+      const uploadRes = await imagekit.upload({
+        file: req.file.buffer,
+        fileName: `trip_cover_${userId}_${Date.now()}`,
+        folder: '/globetrotter/trips'
+      });
+      sanitizedPhotoUrl = uploadRes.url;
+    } else if (coverPhotoUrl && typeof coverPhotoUrl === 'string' && coverPhotoUrl.trim()) {
       const trimmedUrl = coverPhotoUrl.trim();
       if (!/^https?:\/\//i.test(trimmedUrl) && !trimmedUrl.startsWith('data:image/')) {
         return res.status(422).json({

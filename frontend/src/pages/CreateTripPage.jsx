@@ -18,6 +18,8 @@ export default function CreateTripPage() {
     coverPhotoUrl: '',
   });
 
+  const [selectedFile, setSelectedFile] = useState(null);
+
   const [fieldErrors, setFieldErrors] = useState({});
   const [popularCities, setPopularCities] = useState([]);
   const [loadingCities, setLoadingCities] = useState(true);
@@ -89,9 +91,20 @@ export default function CreateTripPage() {
     }
     if (field === 'coverPhotoUrl') {
       setPreviewImageError(false);
+      if (!value.startsWith('blob:')) {
+        setSelectedFile(null); // Clear selected file if user manually types a URL
+      }
     }
     if (generalError) {
       setGeneralError(null);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      handleChange('coverPhotoUrl', URL.createObjectURL(file));
     }
   };
 
@@ -198,16 +211,20 @@ export default function CreateTripPage() {
     setLoading(true);
 
     try {
-      const payload = {
-        name: formData.name.trim(),
-        description: formData.description.trim() || null,
-        startDate: formData.startDate,
-        endDate: formData.endDate,
-        totalBudget: formData.totalBudget !== '' ? parseFloat(formData.totalBudget) : null,
-        coverPhotoUrl: formData.coverPhotoUrl.trim() || null,
-      };
+      const submitData = new FormData();
+      submitData.append('name', formData.name.trim());
+      if (formData.description?.trim()) submitData.append('description', formData.description.trim());
+      submitData.append('startDate', formData.startDate);
+      submitData.append('endDate', formData.endDate);
+      if (formData.totalBudget !== '') submitData.append('totalBudget', parseFloat(formData.totalBudget));
+      
+      if (selectedFile) {
+        submitData.append('coverPhoto', selectedFile);
+      } else if (formData.coverPhotoUrl?.trim()) {
+        submitData.append('coverPhotoUrl', formData.coverPhotoUrl.trim());
+      }
 
-      const res = await api.post('/trips', payload);
+      const res = await api.post('/trips', submitData);
 
       if (res.data?.id) {
         navigate(`/trips/${res.data.id}/builder`);
@@ -385,15 +402,23 @@ export default function CreateTripPage() {
             </div>
 
             <div className="input-group">
-              <label htmlFor="coverPhotoUrl">Cover Photo URL (Optional)</label>
-              <input
-                id="coverPhotoUrl"
-                type="url"
-                className={`input-field ${fieldErrors.coverPhotoUrl ? 'input-error' : ''}`}
-                placeholder="https://images.unsplash.com/..."
-                value={formData.coverPhotoUrl}
-                onChange={e => handleChange('coverPhotoUrl', e.target.value)}
-              />
+              <label htmlFor="coverPhotoUrl">Cover Photo (Upload or URL)</label>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input
+                  id="coverPhotoUrl"
+                  type="url"
+                  className={`input-field ${fieldErrors.coverPhotoUrl ? 'input-error' : ''}`}
+                  placeholder="https://..."
+                  value={formData.coverPhotoUrl && formData.coverPhotoUrl.startsWith('blob:') ? 'Local file selected' : formData.coverPhotoUrl}
+                  onChange={e => handleChange('coverPhotoUrl', e.target.value)}
+                  readOnly={formData.coverPhotoUrl && formData.coverPhotoUrl.startsWith('blob:')}
+                  style={{ flex: 1 }}
+                />
+                <label className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '0 1rem', whiteSpace: 'nowrap' }}>
+                  <span>Upload Image</span>
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
+                </label>
+              </div>
               {fieldErrors.coverPhotoUrl && (
                 <span style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px', display: 'block' }}>
                   {fieldErrors.coverPhotoUrl}
