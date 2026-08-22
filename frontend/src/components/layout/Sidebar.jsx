@@ -202,8 +202,12 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* User Footer */}
         <div className="sidebar-footer">
           <div className="user-snippet">
-            <div className="user-avatar">
-              {user?.firstName?.[0] || user?.fullName?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
+            <div className="user-avatar" style={{ overflow: 'hidden' }}>
+              {user?.photoUrl ? (
+                <img src={user.photoUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                user?.firstName?.[0] || user?.fullName?.[0] || user?.email?.[0]?.toUpperCase() || 'U'
+              )}
             </div>
             <div className="user-info">
               <div className="user-name">{user?.fullName || user?.firstName || 'Traveler'}</div>

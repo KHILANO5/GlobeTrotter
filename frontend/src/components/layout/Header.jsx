@@ -82,10 +82,15 @@ export default function Header({ onMenuClick, sidebarOpen }) {
               justifyContent: 'center',
               fontSize: '14px',
               fontWeight: '600',
-              boxShadow: 'var(--inset-shadow-dark)'
+              boxShadow: 'var(--inset-shadow-dark)',
+              overflow: 'hidden'
             }}
           >
-            {userInitial}
+            {user?.photoUrl ? (
+              <img src={user.photoUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              userInitial
+            )}
           </div>
         </Link>
       </div>

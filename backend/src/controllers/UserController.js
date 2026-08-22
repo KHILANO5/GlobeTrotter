@@ -1,6 +1,7 @@
 const { db } = require('../config/db');
 const { users, savedDestinations, cities, trips } = require('../db/schema');
 const { eq, sql, and } = require('drizzle-orm');
+const imagekit = require('../services/imagekit');
 
 // GET /api/v1/users/me & /api/users/me
 const getMe = async (req, res) => {
@@ -112,7 +113,51 @@ const getSavedDestinations = async (req, res) => {
   }
 };
 
+// PUT /api/v1/users/me
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { firstName, lastName, username, phoneNumber, city, country } = req.body;
+
+    let updateData = {};
+    if (firstName !== undefined) updateData.firstName = firstName;
+    if (lastName !== undefined) updateData.lastName = lastName;
+    if (username !== undefined) updateData.username = username;
+    if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
+    if (city !== undefined) updateData.city = city;
+    if (country !== undefined) updateData.country = country;
+
+    // Handle Image upload if provided
+    if (req.file) {
+      const uploadRes = await imagekit.upload({
+        file: req.file.buffer, // required
+        fileName: `user_profile_${userId}_${Date.now()}`, // required
+        folder: '/globetrotter/users'
+      });
+      updateData.photoUrl = uploadRes.url;
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      updateData.updatedAt = new Date();
+      await db.update(users)
+        .set(updateData)
+        .where(eq(users.id, userId));
+    }
+
+    return res.status(200).json({ message: 'Profile updated successfully' });
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    return res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to update profile.'
+      }
+    });
+  }
+};
+
 module.exports = {
   getMe,
-  getSavedDestinations
+  getSavedDestinations,
+  updateProfile
 };

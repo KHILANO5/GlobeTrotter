@@ -305,12 +305,31 @@ export default function CommunityPage() {
                     </div>
 
                     <div className="community-post-actions">
-                      <Link to={`/shared/${trip.id}`} className="btn btn-secondary btn-sm">
+                      <Link to={trip.shareToken ? `/shared/${trip.shareToken}` : `/trips/${trip.id}/itinerary`} className="btn btn-secondary btn-sm">
                         View Public Plan
                       </Link>
-                      <Link to="/trips/new" className="btn btn-primary btn-sm">
-                        Copy Trip
-                      </Link>
+                      {trip.shareToken ? (
+                        <Link to={`/shared/${trip.shareToken}`} className="btn btn-primary btn-sm">
+                          Copy Trip
+                        </Link>
+                      ) : (
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={async () => {
+                            try {
+                              const res = await api.post(`/trips/${trip.id}/copy`);
+                              if (res.data?.id) {
+                                alert('🎉 Trip copied successfully to your account!');
+                                window.location.href = `/trips/${res.data.id}/builder`;
+                              }
+                            } catch (err) {
+                              alert('Failed to copy trip. Make sure you are logged in.');
+                            }
+                          }}
+                        >
+                          Copy Trip
+                        </button>
+                      )}
                     </div>
                   </div>
 
