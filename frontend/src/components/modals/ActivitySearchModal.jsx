@@ -197,6 +197,8 @@ export default function ActivitySearchModal({ isOpen, onClose, onAssignActivity,
                 <input
                   type="date"
                   className="input-field"
+                  min={stop?.startDate}
+                  max={stop?.endDate}
                   value={scheduledDate}
                   onChange={e => setScheduledDate(e.target.value)}
                 />
@@ -216,6 +218,8 @@ export default function ActivitySearchModal({ isOpen, onClose, onAssignActivity,
                 <label>Cost Override ($)</label>
                 <input
                   type="number"
+                  min="0"
+                  step="any"
                   className="input-field"
                   placeholder={selectedActivity.estimatedCost || '0'}
                   value={costOverride}

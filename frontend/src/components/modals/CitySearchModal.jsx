@@ -66,6 +66,14 @@ export default function CitySearchModal({ isOpen, onClose, onSelectCity, tripDat
       alert('Please specify start and end dates for this stop.');
       return;
     }
+    if (endDate < startDate) {
+      alert('Stop end date cannot be earlier than start date.');
+      return;
+    }
+    if (budget !== '' && (isNaN(Number(budget)) || Number(budget) < 0)) {
+      alert('Section budget must be a positive number or 0.');
+      return;
+    }
 
     onSelectCity({
       cityId: selectedCity?.id || null,
@@ -76,7 +84,7 @@ export default function CitySearchModal({ isOpen, onClose, onSelectCity, tripDat
       description: description.trim() || null,
       startDate,
       endDate,
-      budget: budget ? parseFloat(budget) : null,
+      budget: budget !== '' ? parseFloat(budget) : null,
     });
 
     // Reset and close
@@ -200,8 +208,16 @@ export default function CitySearchModal({ isOpen, onClose, onSelectCity, tripDat
               <input
                 type="date"
                 className="input-field"
+                min={tripDates?.startDate}
+                max={tripDates?.endDate}
                 value={startDate}
-                onChange={e => setStartDate(e.target.value)}
+                onChange={e => {
+                  const newStart = e.target.value;
+                  setStartDate(newStart);
+                  if (endDate && endDate < newStart) {
+                    setEndDate(newStart);
+                  }
+                }}
                 required
               />
             </div>
@@ -211,6 +227,8 @@ export default function CitySearchModal({ isOpen, onClose, onSelectCity, tripDat
               <input
                 type="date"
                 className="input-field"
+                min={startDate || tripDates?.startDate}
+                max={tripDates?.endDate}
                 value={endDate}
                 onChange={e => setEndDate(e.target.value)}
                 required
@@ -221,6 +239,8 @@ export default function CitySearchModal({ isOpen, onClose, onSelectCity, tripDat
               <label>Section Budget ($)</label>
               <input
                 type="number"
+                min="0"
+                step="any"
                 className="input-field"
                 placeholder="e.g. 800"
                 value={budget}
