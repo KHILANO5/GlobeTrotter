@@ -70,7 +70,14 @@ const getCalendar = async (req, res) => {
       }) || stopsList[0] || null;
 
       const items = allActivities
-        .filter(a => (a.scheduledDate ? a.scheduledDate === dateStr : a.tripStopId === activeStop?.id))
+        .filter(a => {
+          if (a.scheduledDate) return a.scheduledDate === dateStr;
+          const stopStartStr = activeStop?.startDate ? new Date(activeStop.startDate).toISOString().split('T')[0] : null;
+          if (stopStartStr) {
+            return a.tripStopId === activeStop?.id && dateStr === stopStartStr;
+          }
+          return a.tripStopId === activeStop?.id && i === 0;
+        })
         .map(a => ({
           type: 'activity',
           id: a.id,
