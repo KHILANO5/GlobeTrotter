@@ -55,7 +55,7 @@ export default function MyTripsPage() {
   const filteredTrips = useMemo(() => {
     if (!searchTerm.trim()) return trips;
     const term = searchTerm.toLowerCase().trim();
-    return trips.filter(trip => 
+    return trips.filter(trip =>
       (trip.name && trip.name.toLowerCase().includes(term)) ||
       (trip.description && trip.description.toLowerCase().includes(term))
     );
@@ -104,9 +104,9 @@ export default function MyTripsPage() {
 
   const getStatusBadgeStyle = (status) => {
     const s = (status || 'upcoming').toLowerCase();
-    const baseStyle = { 
-      padding: '4px 8px', 
-      borderRadius: '12px', 
+    const baseStyle = {
+      padding: '4px 8px',
+      borderRadius: '12px',
       backdropFilter: 'blur(4px)',
       boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
     };
@@ -124,7 +124,7 @@ export default function MyTripsPage() {
 
   return (
     <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-      
+
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.75rem' }}>
         <div>
@@ -141,7 +141,7 @@ export default function MyTripsPage() {
       {/* Filter, Search & Sort Bar */}
       <div style={{ backgroundColor: '#ffffff', padding: '1.25rem', borderRadius: '12px', border: '1px solid var(--border-passive)', marginBottom: '1.75rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-          
+
           {/* Status Filter Tabs */}
           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
             {[
@@ -261,37 +261,34 @@ export default function MyTripsPage() {
 
                   {/* Status Badge overlay */}
                   <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', gap: '0.4rem', zIndex: 10 }}>
-                    <span 
-                      style={{ 
+                    <span
+                      style={{
                         ...getStatusBadgeStyle(trip.status),
-                        fontSize: '11px', 
+                        fontSize: '11px',
                         fontWeight: '700',
                         textTransform: 'capitalize'
                       }}
                     >
                       {trip.status}
                     </span>
-                    {trip.isPublic && (
-<<<<<<< Updated upstream
-                      <span className="nav-badge green" style={{ fontSize: '10px', fontWeight: '600', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                        <GlobeIcon size={11} />
-                        <span>Shared</span>
-=======
-                      <span style={{ 
-                        fontSize: '11px', 
-                        fontWeight: '700', 
-                        padding: '4px 8px', 
-                        borderRadius: '12px', 
-                        backgroundColor: 'rgba(59, 130, 246, 0.85)', 
-                        color: '#ffffff', 
-                        border: '1px solid rgba(255,255,255,0.4)', 
-                        backdropFilter: 'blur(4px)', 
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.3)' 
-                      }}>
-                        🌐 Shared
->>>>>>> Stashed changes
-                      </span>
-                    )}
+                    <span style={{
+                      fontSize: '11px',
+                      fontWeight: '700',
+                      padding: '4px 8px',
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(59, 130, 246, 0.85)',
+                      color: '#ffffff',
+                      border: '1px solid rgba(255,255,255,0.4)',
+                      backdropFilter: 'blur(4px)',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}>
+                      <GlobeIcon size={11} />
+                      <span>Shared</span>
+                    </span>
+                    )
                   </div>
                 </div>
 

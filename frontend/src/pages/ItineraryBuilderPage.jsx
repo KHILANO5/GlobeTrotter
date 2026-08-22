@@ -251,17 +251,6 @@ export default function ItineraryBuilderPage() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-<<<<<<< Updated upstream
-            <button
-              type="button"
-              className="btn btn-primary btn-sm"
-              onClick={() => setIsCityModalOpen(true)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-            >
-              <PlusIcon size={14} />
-              <span>Add Stop / Section</span>
-            </button>
-=======
             {!isCompleted && (
               <button
                 type="button"
@@ -269,10 +258,10 @@ export default function ItineraryBuilderPage() {
                 onClick={() => setIsCityModalOpen(true)}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
-                + Add Stop / Section
+                <PlusIcon size={14} />
+                <span>Add Stop / Section</span>
               </button>
             )}
->>>>>>> Stashed changes
             <Link to={`/trips/${tripId}/itinerary`} className="btn btn-secondary btn-sm">
               Itinerary View →
             </Link>
@@ -312,28 +301,17 @@ export default function ItineraryBuilderPage() {
             <p className="text-muted text-sm" style={{ maxWidth: '460px', margin: '0 auto 1.5rem' }}>
               Your journey is waiting to be built! Add your first destination city or travel leg to begin planning activities.
             </p>
-<<<<<<< Updated upstream
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => setIsCityModalOpen(true)}
-              style={{ padding: '10px 20px', fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-            >
-              <PlusIcon size={14} />
-              <span>Add First Destination Stop</span>
-            </button>
-=======
             {!isCompleted && (
               <button
                 type="button"
                 className="btn btn-primary"
                 onClick={() => setIsCityModalOpen(true)}
-                style={{ padding: '10px 20px', fontSize: '14px' }}
+                style={{ padding: '10px 20px', fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
-                + Add First Destination Stop
+                <PlusIcon size={14} />
+                <span>Add First Destination Stop</span>
               </button>
             )}
->>>>>>> Stashed changes
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -421,28 +399,17 @@ export default function ItineraryBuilderPage() {
                     <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-charcoal)' }}>
                       Activities & Experiences ({stop.activities?.length || 0})
                     </span>
-<<<<<<< Updated upstream
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-sm"
-                      style={{ fontSize: '12px', padding: '5px 12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                      onClick={() => handleOpenActivityModal(stop)}
-                    >
-                      <PlusIcon size={12} />
-                      <span>Assign Activity</span>
-                    </button>
-=======
                     {!isCompleted && (
                       <button
                         type="button"
                         className="btn btn-secondary btn-sm"
-                        style={{ fontSize: '12px', padding: '5px 12px' }}
+                        style={{ fontSize: '12px', padding: '5px 12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                         onClick={() => handleOpenActivityModal(stop)}
                       >
-                        + Assign Activity
+                        <PlusIcon size={12} />
+                        <span>Assign Activity</span>
                       </button>
                     )}
->>>>>>> Stashed changes
                   </div>
 
                   {stop.activities && stop.activities.length > 0 ? (
