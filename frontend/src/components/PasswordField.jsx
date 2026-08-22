@@ -13,22 +13,26 @@ function PasswordField({
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="password-input-wrapper" style={style}>
-      <input
-        type={showPassword ? 'text' : 'password'}
-        id={id}
-        name={id}
-        className={`input-field ${className}`}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        required={required}
-        autoComplete={autoComplete}
-      />
+    <div className="password-input-wrapper" style={{ position: 'relative', width: '100%', ...style }}>
       <button
         type="button"
         className="password-toggle-btn"
         onClick={() => setShowPassword((prev) => !prev)}
+        style={{
+          position: 'absolute',
+          left: '12px',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          background: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 0,
+          color: 'var(--text-muted)',
+          zIndex: 2
+        }}
         aria-label={showPassword ? 'Hide password' : 'Show password'}
         title={showPassword ? 'Hide password' : 'Show password'}
         tabIndex={-1}
@@ -65,6 +69,18 @@ function PasswordField({
           </svg>
         )}
       </button>
+      <input
+        type={showPassword ? 'text' : 'password'}
+        id={id}
+        name={id}
+        className={`input-field ${className}`}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        required={required}
+        autoComplete={autoComplete}
+        style={{ paddingLeft: '38px', width: '100%' }}
+      />
     </div>
   );
 }

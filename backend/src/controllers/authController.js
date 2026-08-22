@@ -18,7 +18,11 @@ const register = async (req, res) => {
 
   try {
     const cleanEmail = email.toLowerCase().trim();
-    const cleanUsername = username.toLowerCase().trim();
+    
+    // Determine cleanUsername safely
+    const cleanUsername = username 
+      ? username.toLowerCase().trim() 
+      : cleanEmail.split('@')[0] + '_' + Math.floor(Math.random() * 1000);
     
     // Check if email or username already exists
     const existingUser = await db
@@ -53,7 +57,7 @@ const register = async (req, res) => {
       fName = parts[0];
       lName = parts.slice(1).join(' ') || 'User';
     }
-    const cleanUsername = username || cleanEmail.split('@')[0] + '_' + Math.floor(Math.random() * 1000);
+
 
     // Generate a 6-digit verification code
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
