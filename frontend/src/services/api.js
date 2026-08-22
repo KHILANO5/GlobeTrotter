@@ -1,11 +1,9 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 const api = {
   getHeaders() {
     const token = localStorage.getItem('token');
-    const headers = {
-      'Content-Type': 'application/json',
-    };
+    const headers = {};
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
@@ -23,6 +21,11 @@ const api = {
         ...options.headers
       }
     };
+
+    // Default to application/json if Content-Type is not explicitly skipped or set
+    if (!config.headers.hasOwnProperty('Content-Type') && !(options.body instanceof FormData)) {
+      config.headers['Content-Type'] = 'application/json';
+    }
 
     try {
       const response = await fetch(url, config);
@@ -44,10 +47,11 @@ const api = {
   },
 
   post(endpoint, body, options = {}) {
+    const isFormData = body instanceof FormData;
     return this.request(endpoint, {
       ...options,
       method: 'POST',
-      body: JSON.stringify(body)
+      body: isFormData ? body : JSON.stringify(body)
     });
   }
 };

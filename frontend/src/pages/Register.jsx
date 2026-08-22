@@ -6,28 +6,42 @@ import PasswordField from '../components/PasswordField';
 function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [profilePicture, setProfilePicture] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!fullName || !email || !password) return;
+    if (!firstName || !lastName || !username || !email || !password) return;
 
     setError('');
     setSuccess('');
     setLoading(true);
+
+    const formData = new FormData();
+    formData.append('firstName', firstName);
+    formData.append('lastName', lastName);
+    formData.append('username', username);
+    formData.append('email', email);
+    formData.append('password', password);
+    if (profilePicture) {
+      formData.append('profilePicture', profilePicture);
+    }
+
     try {
-      await register(fullName, email, password);
+      await register(formData);
       setSuccess('Account created successfully! Redirecting to verification...');
       setTimeout(() => {
         navigate(`/verify-email?email=${encodeURIComponent(email)}`);
       }, 2000);
     } catch (err) {
-      setError(err.message || 'Registration failed. Email might already be registered.');
+      setError(err.message || 'Registration failed. Email or username might already be registered.');
     } finally {
       setLoading(false);
     }
@@ -53,15 +67,42 @@ function Register() {
           </div>
         )}
 
+        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+          <div className="input-group" style={{ flex: 1, marginBottom: 0 }}>
+            <label htmlFor="firstName">First Name</label>
+            <input
+              type="text"
+              id="firstName"
+              className="input-field"
+              placeholder="John"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="input-group" style={{ flex: 1, marginBottom: 0 }}>
+            <label htmlFor="lastName">Last Name</label>
+            <input
+              type="text"
+              id="lastName"
+              className="input-field"
+              placeholder="Doe"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+
         <div className="input-group">
-          <label htmlFor="fullName">Full Name</label>
+          <label htmlFor="username">Username</label>
           <input
             type="text"
-            id="fullName"
+            id="username"
             className="input-field"
-            placeholder="John Doe"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            placeholder="johndoe123"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>
@@ -76,6 +117,18 @@ function Register() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+          />
+        </div>
+
+        <div className="input-group">
+          <label htmlFor="profilePicture">Profile Picture (Optional)</label>
+          <input
+            type="file"
+            id="profilePicture"
+            className="input-field"
+            accept="image/*"
+            onChange={(e) => setProfilePicture(e.target.files[0])}
+            style={{ padding: '0.5rem' }}
           />
         </div>
 
@@ -95,7 +148,7 @@ function Register() {
           type="submit" 
           className="btn btn-primary" 
           disabled={loading || success}
-          style={{ marginBottom: '1.5rem' }}
+          style={{ marginBottom: '1.5rem', width: '100%' }}
         >
           {loading ? 'Creating account...' : 'Sign Up'}
         </button>

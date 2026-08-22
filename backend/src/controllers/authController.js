@@ -4,6 +4,7 @@ const { eq, sql } = require('drizzle-orm');
 const { db } = require('../config/db');
 const { users } = require('../db/schema');
 const { sendVerificationCode, sendResetPasswordCode } = require('../utils/mailer');
+const imagekit = require('../services/imagekit');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'hackathon_secret_key_123!';
 
@@ -18,15 +19,34 @@ const register = async (req, res) => {
   try {
     const cleanEmail = email.toLowerCase().trim();
     
-    // Check if email already exists
+    // Determine cleanUsername safely
+    const cleanUsername = username 
+      ? username.toLowerCase().trim() 
+      : cleanEmail.split('@')[0] + '_' + Math.floor(Math.random() * 1000);
+    
+    // Check if email or username already exists
     const existingUser = await db
       .select()
       .from(users)
-      .where(eq(users.email, cleanEmail))
+      .where(sql`${users.email} = ${cleanEmail} OR ${users.username} = ${cleanUsername}`)
       .limit(1);
 
     if (existingUser.length > 0) {
-      return res.status(400).json({ error: 'A user with this email already exists.' });
+      if (existingUser[0].email === cleanEmail) {
+        return res.status(400).json({ error: 'A user with this email already exists.' });
+      } else {
+        return res.status(400).json({ error: 'Username is already taken.' });
+      }
+    }
+
+    let photoUrl = null;
+    if (req.file) {
+      const uploadResponse = await imagekit.upload({
+        file: req.file.buffer,
+        fileName: `profile_${Date.now()}_${req.file.originalname}`,
+        folder: '/profiles'
+      });
+      photoUrl = uploadResponse.url;
     }
 
     // Determine first and last name
@@ -37,7 +57,7 @@ const register = async (req, res) => {
       fName = parts[0];
       lName = parts.slice(1).join(' ') || 'User';
     }
-    const cleanUsername = username || cleanEmail.split('@')[0] + '_' + Math.floor(Math.random() * 1000);
+
 
     // Generate a 6-digit verification code
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -52,7 +72,8 @@ const register = async (req, res) => {
       passwordHash: hashedPassword,
       role: 'user',
       isVerified: false,
-      verificationCode: verificationCode
+      verificationCode: verificationCode,
+      photoUrl: photoUrl
     }).returning({
       id: users.id,
       firstName: users.firstName,
@@ -152,6 +173,7 @@ const login = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         username: user.username,
+        photoUrl: user.photoUrl,
         fullName: displayName,
         email: user.email,
         role: user.role
@@ -286,7 +308,7 @@ const resetPassword = async (req, res) => {
     await db
       .update(users)
       .set({
-        password: hashedPassword,
+        passwordHash: hashedPassword,
         resetPasswordCode: null
       })
       .where(eq(users.id, user.id));
@@ -309,6 +331,7 @@ const getProfile = async (req, res) => {
         firstName: users.firstName,
         lastName: users.lastName,
         username: users.username,
+
         email: users.email,
         phoneNumber: users.phoneNumber,
         city: users.city,
