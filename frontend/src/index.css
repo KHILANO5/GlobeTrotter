@@ -205,6 +205,8 @@ p {
 
 .app-sidebar {
   width: 250px;
+  min-width: 250px;
+  max-width: 250px;
   flex-shrink: 0;
   background-color: var(--bg-sidebar);
   border-right: 1px solid var(--border-passive);
@@ -214,7 +216,26 @@ p {
   position: sticky;
   top: 0;
   z-index: 40;
-  transition: transform 0.25s ease;
+  overflow: hidden;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.25s ease,
+              border-color 0.25s ease;
+  will-change: width, transform, opacity;
+}
+
+/* Desktop Collapsed Transition */
+@media (min-width: 901px) {
+  .app-sidebar.collapsed {
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+    border-right-color: transparent;
+  }
 }
 
 .app-main {
@@ -225,6 +246,7 @@ p {
   overflow-y: auto;
   height: 100vh;
   scrollbar-gutter: stable;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .app-header {
@@ -245,6 +267,16 @@ p {
   z-index: 30;
 }
 
+.header-toggle-btn:hover {
+  background-color: var(--bg-hover) !important;
+  border-color: rgba(28, 28, 28, 0.3) !important;
+  transform: translateY(-1px);
+}
+
+.header-toggle-btn:active {
+  transform: translateY(0);
+}
+
 .app-content {
   padding: 1.75rem 2rem;
   max-width: 1240px;
@@ -252,15 +284,34 @@ p {
   margin: 0 auto;
 }
 
+.sidebar-backdrop {
+  display: none;
+}
+
 @media (max-width: 900px) {
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.35);
+    z-index: 45;
+    cursor: pointer;
+  }
+
   .app-sidebar {
     position: fixed;
+    width: 260px;
+    min-width: 260px;
+    max-width: 260px;
     transform: translateX(-100%);
-    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+    z-index: 50;
   }
 
   .app-sidebar.open {
     transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .app-content {
