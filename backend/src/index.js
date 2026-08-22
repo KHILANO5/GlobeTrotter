@@ -13,6 +13,7 @@ const calendarRoutes = require('./routes/calendarRoutes');
 const shareRoutes = require('./routes/shareRoutes');
 const userRoutes = require('./routes/userRoutes');
 const communityRoutes = require('./routes/communityRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 require('dotenv').config();
 
@@ -54,6 +55,9 @@ app.use('/api/users', userRoutes);
 
 app.use('/api/v1/community', communityRoutes);
 app.use('/api/community', communityRoutes);
+
+app.use('/api/v1/admin', adminRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Welcome route
 app.get('/', (req, res) => {
