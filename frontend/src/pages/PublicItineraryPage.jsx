@@ -63,7 +63,8 @@ export default function PublicItineraryPage() {
   if (loading) {
     return (
       <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-        Loading Shared Itinerary...
+        <div style={{ display: 'inline-block', width: '24px', height: '24px', border: '3px solid rgba(0,0,0,0.1)', borderTopColor: 'var(--primary-dark)', borderRadius: '50%', animation: 'spin 0.8s linear infinite', marginBottom: '0.75rem' }} />
+        <div>Loading Shared Itinerary...</div>
       </div>
     );
   }
@@ -73,49 +74,64 @@ export default function PublicItineraryPage() {
       <div className="shell-container" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
         <div style={{ fontSize: '36px', marginBottom: '0.5rem' }}>🔗</div>
         <h3>Shared Link Unavailable</h3>
-        <p className="text-muted text-sm">{error || 'This link may have been revoked by the creator.'}</p>
-        <Link to="/dashboard" className="btn btn-primary" style={{ marginTop: '1.25rem' }}>
+        <p className="text-muted text-sm" style={{ maxWidth: '400px', margin: '0.5rem auto 1.5rem' }}>
+          {error || 'This link may have been revoked by the creator or does not exist.'}
+        </p>
+        <Link to="/dashboard" className="btn btn-primary">
           Go to GlobeTrotter Home
         </Link>
       </div>
     );
   }
 
-  const { tripName, description, startDate, endDate, ownerDisplayName, days = [] } = trip;
+  const { tripName, description, startDate, endDate, ownerDisplayName, coverPhotoUrl, days = [] } = trip;
 
   return (
-    <div style={{ maxWidth: '920px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '940px', margin: '0 auto' }}>
       
       {/* Shared Itinerary Header */}
-      <div style={{ backgroundColor: '#ffffff', padding: '2rem', borderRadius: '12px', border: '1px solid var(--border-passive)', marginBottom: '1.75rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
-          <div>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.4rem' }}>
-              <span className="shell-badge green">Public Shared Itinerary</span>
-              <span className="nav-badge">Shared by {ownerDisplayName}</span>
+      <div style={{ backgroundColor: '#ffffff', borderRadius: '14px', border: '1px solid var(--border-passive)', overflow: 'hidden', marginBottom: '1.75rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+        {coverPhotoUrl && (
+          <div style={{ height: '200px', width: '100%', overflow: 'hidden' }}>
+            <img
+              src={coverPhotoUrl}
+              alt={tripName}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+          </div>
+        )}
+
+        <div style={{ padding: '1.75rem 2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.4rem' }}>
+                <span className="shell-badge green">Public Itinerary</span>
+                <span className="nav-badge">Shared by {ownerDisplayName}</span>
+              </div>
+              <h1 style={{ margin: '0.25rem 0', fontSize: '26px' }}>{tripName}</h1>
+              <p className="text-sm text-muted" style={{ margin: 0 }}>
+                📅 {new Date(startDate).toLocaleDateString()} – {new Date(endDate).toLocaleDateString()} • {days.length} Days Itinerary
+              </p>
             </div>
-            <h1 style={{ margin: '0.25rem 0', fontSize: '26px' }}>{tripName}</h1>
-            <p className="text-sm text-muted" style={{ margin: 0 }}>
-              📅 {new Date(startDate).toLocaleDateString()} – {new Date(endDate).toLocaleDateString()} • {days.length} Days Itinerary
-            </p>
+
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleCopyTrip}
+              disabled={copying}
+              style={{ fontSize: '14px', padding: '10px 22px' }}
+            >
+              {copying ? 'Copying to Account...' : '📋 Copy Trip to My Account'}
+            </button>
           </div>
 
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={handleCopyTrip}
-            disabled={copying}
-            style={{ fontSize: '14px', padding: '10px 20px' }}
-          >
-            {copying ? 'Copying to Account...' : '📋 Copy Trip to My Account'}
-          </button>
+          {description && (
+            <p className="text-sm" style={{ color: 'var(--text-body)', marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--border-passive)', fontStyle: 'italic', lineHeight: '1.4' }}>
+              "{description}"
+            </p>
+          )}
         </div>
-
-        {description && (
-          <p className="text-sm" style={{ color: 'var(--text-body)', marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--border-passive)', fontStyle: 'italic' }}>
-            "{description}"
-          </p>
-        )}
       </div>
 
       {/* Day by Day Plan */}
@@ -125,51 +141,52 @@ export default function PublicItineraryPage() {
             key={day.date}
             style={{
               backgroundColor: '#ffffff',
-              borderRadius: '10px',
+              borderRadius: '12px',
               border: '1px solid var(--border-passive)',
               overflow: 'hidden',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
             }}
           >
             <div
               style={{
                 backgroundColor: 'var(--bg-page)',
-                padding: '0.85rem 1.25rem',
+                padding: '0.9rem 1.25rem',
                 borderBottom: '1px solid var(--border-passive)',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
                 <span className="nav-badge green" style={{ fontWeight: '700' }}>
                   Day {day.dayNumber}
                 </span>
-                <span style={{ fontWeight: '600', fontSize: '14px' }}>
+                <span style={{ fontWeight: '600', fontSize: '14px', color: 'var(--text-charcoal)' }}>
                   {new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                 </span>
-                <span className="text-muted text-sm">• {day.stopTitle}</span>
+                <span className="text-muted text-sm">• 📍 {day.stopTitle}</span>
               </div>
             </div>
 
             <div style={{ padding: '1.25rem' }}>
               {day.activities && day.activities.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
                   {day.activities.map((act, index) => (
                     <div
                       key={index}
                       style={{
                         padding: '0.65rem 0.9rem',
                         backgroundColor: 'var(--bg-page)',
-                        borderRadius: '6px',
+                        borderRadius: '8px',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '0.75rem',
+                        gap: '0.85rem',
                       }}
                     >
-                      <span style={{ fontWeight: '700', fontSize: '12px', color: 'var(--text-primary)' }}>
+                      <span style={{ fontWeight: '700', fontSize: '12px', color: 'var(--accent-terra)' }}>
                         ⏰ {act.scheduledTime || '09:00'}
                       </span>
-                      <span style={{ fontWeight: '500', fontSize: '14px' }}>
+                      <span style={{ fontWeight: '500', fontSize: '14px', color: 'var(--text-charcoal)' }}>
                         {act.name}
                       </span>
                       <span className="nav-badge" style={{ fontSize: '10px', textTransform: 'capitalize' }}>
@@ -179,7 +196,7 @@ export default function PublicItineraryPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-sm text-muted" style={{ fontStyle: 'italic' }}>
+                <div className="text-sm text-muted" style={{ fontStyle: 'italic', textAlign: 'center', padding: '0.5rem 0' }}>
                   Open exploration and free time.
                 </div>
               )}
@@ -189,9 +206,9 @@ export default function PublicItineraryPage() {
       </div>
 
       {/* Copy CTA Banner */}
-      <div className="shell-container" style={{ textAlign: 'center', padding: '2.5rem' }}>
-        <h3>Inspired by this Journey?</h3>
-        <p className="text-muted text-sm" style={{ maxWidth: '500px', margin: '0.5rem auto 1.5rem' }}>
+      <div className="shell-container" style={{ textAlign: 'center', padding: '2.75rem 2rem', borderRadius: '14px' }}>
+        <h3 style={{ margin: '0 0 0.5rem 0' }}>Inspired by this Journey?</h3>
+        <p className="text-muted text-sm" style={{ maxWidth: '520px', margin: '0 auto 1.5rem' }}>
           You can copy this complete travel plan into your GlobeTrotter account with all stops, cities, and scheduled activities preserved to customize for your own vacation.
         </p>
         <button
@@ -199,6 +216,7 @@ export default function PublicItineraryPage() {
           className="btn btn-primary"
           onClick={handleCopyTrip}
           disabled={copying}
+          style={{ padding: '10px 24px', fontSize: '15px' }}
         >
           {copying ? 'Copying...' : '📋 Copy Trip to My Account →'}
         </button>
