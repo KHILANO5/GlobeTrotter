@@ -44,8 +44,8 @@
   --ring-blue: rgba(59, 130, 246, 0.5);
   --focus-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
   --inset-shadow-dark: rgba(255, 255, 255, 0.2) 0px 0.5px 0px 0px inset,
-                       rgba(0, 0, 0, 0.2) 0px 0px 0px 0.5px inset,
-                       rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+    rgba(0, 0, 0, 0.2) 0px 0px 0px 0.5px inset,
+    rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
 
   /* Typography System */
   --font-system: "Camera Plain Variable", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -218,11 +218,11 @@ p {
   z-index: 40;
   overflow: hidden;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.25s ease,
-              border-color 0.25s ease;
+    min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.25s ease,
+    border-color 0.25s ease;
   will-change: width, transform, opacity;
 }
 
@@ -505,7 +505,7 @@ p {
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, rgba(28, 28, 28, 0.75) 0%, rgba(13, 92, 70, 0.65) 100%),
-              url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&auto=format&fit=crop&q=80') center/cover no-repeat;
+    url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&auto=format&fit=crop&q=80') center/cover no-repeat;
   color: #ffffff;
   text-align: center;
   padding: 1.5rem;
@@ -923,7 +923,8 @@ p {
   margin-top: 1rem;
 }
 
-.db-details-table th, .db-details-table td {
+.db-details-table th,
+.db-details-table td {
   padding: 10px 14px;
   border-bottom: 1px solid var(--border-passive);
   text-align: left;
@@ -1001,6 +1002,121 @@ p {
   box-shadow: var(--ring-blue) 0px 0px 0px 2px;
 }
 
+/* ==========================================================================
+   Admin Panel (Screen 12) Styles
+   ========================================================================== */
+.admin-tab-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1.25rem 0 1.5rem 0;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.admin-tab-btn {
+  padding: 8px 18px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-passive);
+  border-radius: 20px;
+  font-family: var(--font-system);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-charcoal);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.admin-tab-btn:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--border-interactive);
+}
+
+.admin-tab-btn.active {
+  background-color: var(--primary-dark);
+  color: var(--text-on-dark);
+  border-color: var(--primary-dark);
+  box-shadow: var(--inset-shadow-dark);
+}
+
+.admin-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-metric-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-passive);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin-chart-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-passive);
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-charts-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 900px) {
+  .admin-charts-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.admin-item-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-passive);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.15s ease;
+}
+
+.admin-item-card:hover {
+  border-color: var(--border-interactive);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.admin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.admin-modal-box {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-passive);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 680px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 1.75rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+
 .input-field.input-error {
   border-color: #dc2626 !important;
   background-color: rgba(239, 68, 68, 0.02);
@@ -1014,8 +1130,8 @@ p {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
-

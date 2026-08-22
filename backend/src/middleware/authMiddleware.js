@@ -26,7 +26,7 @@ const requireRole = (requiredRole) => {
       return res.status(401).json({ error: 'Authentication required.' });
     }
 
-    if (req.user.role !== requiredRole) {
+    if (!req.user.role || req.user.role.toLowerCase() !== requiredRole.toLowerCase()) {
       return res.status(403).json({ error: `Forbidden. Requires ${requiredRole} access.` });
     }
 
