@@ -104,16 +104,22 @@ export default function MyTripsPage() {
 
   const getStatusBadgeStyle = (status) => {
     const s = (status || 'upcoming').toLowerCase();
+    const baseStyle = { 
+      padding: '4px 8px', 
+      borderRadius: '12px', 
+      backdropFilter: 'blur(4px)',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+    };
     if (s === 'ongoing') {
-      return { backgroundColor: 'rgba(13, 92, 70, 0.12)', color: 'var(--accent-green)', border: '1px solid rgba(13, 92, 70, 0.25)' };
+      return { ...baseStyle, backgroundColor: 'rgba(13, 92, 70, 0.85)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.4)' };
     }
     if (s === 'upcoming') {
-      return { backgroundColor: 'rgba(28, 28, 28, 0.08)', color: 'var(--text-charcoal)', border: '1px solid var(--border-passive)' };
+      return { ...baseStyle, backgroundColor: 'rgba(0, 0, 0, 0.7)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.4)' };
     }
     if (s === 'completed') {
-      return { backgroundColor: 'rgba(107, 114, 128, 0.1)', color: '#4b5563', border: '1px solid rgba(107, 114, 128, 0.2)' };
+      return { ...baseStyle, backgroundColor: 'rgba(75, 85, 99, 0.85)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.4)' };
     }
-    return {};
+    return baseStyle;
   };
 
   return (
@@ -254,23 +260,36 @@ export default function MyTripsPage() {
                   )}
 
                   {/* Status Badge overlay */}
-                  <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', gap: '0.4rem' }}>
+                  <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', gap: '0.4rem', zIndex: 10 }}>
                     <span 
-                      className="nav-badge" 
                       style={{ 
                         ...getStatusBadgeStyle(trip.status),
                         fontSize: '11px', 
                         fontWeight: '700',
-                        textTransform: 'capitalize',
-                        boxShadow: '0 1px 4px rgba(0,0,0,0.1)'
+                        textTransform: 'capitalize'
                       }}
                     >
                       {trip.status}
                     </span>
                     {trip.isPublic && (
+<<<<<<< Updated upstream
                       <span className="nav-badge green" style={{ fontSize: '10px', fontWeight: '600', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                         <GlobeIcon size={11} />
                         <span>Shared</span>
+=======
+                      <span style={{ 
+                        fontSize: '11px', 
+                        fontWeight: '700', 
+                        padding: '4px 8px', 
+                        borderRadius: '12px', 
+                        backgroundColor: 'rgba(59, 130, 246, 0.85)', 
+                        color: '#ffffff', 
+                        border: '1px solid rgba(255,255,255,0.4)', 
+                        backdropFilter: 'blur(4px)', 
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.3)' 
+                      }}>
+                        🌐 Shared
+>>>>>>> Stashed changes
                       </span>
                     )}
                   </div>
