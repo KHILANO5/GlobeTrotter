@@ -108,14 +108,6 @@ export default function CreateTripPage() {
   };
 
   return (
-<<<<<<< HEAD
-    <div style={{ maxWidth: '780px', margin: '0 auto' }}>
-      <div className="shell-container" style={{ textAlign: 'left', padding: '2.25rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-passive)', paddingBottom: '1rem' }}>
-          <div>
-            <h2>Create Trip</h2>
-            <p className="text-muted text-sm" style={{ margin: 0 }}>Start a new travel plan — Add stops, activities, and budget</p>
-=======
     <div style={{ maxWidth: '820px', margin: '0 auto' }}>
       <div className="shell-container" style={{ textAlign: 'left', padding: '2.25rem' }}>
         
@@ -127,7 +119,6 @@ export default function CreateTripPage() {
             <p className="text-muted text-sm" style={{ margin: 0 }}>
               Set your journey name, dates, and budget — then construct your custom stops in the Itinerary Builder
             </p>
->>>>>>> bb4224b4a0f25d6339e9ba76c6930bbf3ead484e
           </div>
           <Link to="/dashboard" className="btn btn-ghost btn-sm">
             ← Back to Dashboard
@@ -258,8 +249,6 @@ export default function CreateTripPage() {
             </Link>
           </div>
         </form>
-<<<<<<< HEAD
-=======
 
         {/* Tree Hierarchy Path info */}
         <div className="shell-box" style={{ marginTop: '2.5rem', textAlign: 'center' }}>
@@ -268,7 +257,6 @@ export default function CreateTripPage() {
             <strong>Create Trip</strong> → <strong>Itinerary Builder</strong> (Add stops & activities) → <strong>Itinerary View</strong> (Sub-Hub fanning out to Budget, Calendar & Share).
           </p>
         </div>
->>>>>>> bb4224b4a0f25d6339e9ba76c6930bbf3ead484e
       </div>
     </div>
   );

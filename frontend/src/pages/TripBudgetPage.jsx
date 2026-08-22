@@ -44,7 +44,7 @@ export default function TripBudgetPage() {
   const handleAddExpense = async (expensePayload) => {
     try {
       await api.post(`/trips/${tripId}/expenses`, expensePayload);
-      loadBudgetAndStops(); // Reload recalculations
+      loadBudgetAndStops();
     } catch (err) {
       console.error('Error adding expense:', err);
       alert(err.message || 'Failed to add expense.');
@@ -102,59 +102,13 @@ export default function TripBudgetPage() {
       <div style={{ backgroundColor: '#ffffff', padding: '1.75rem', borderRadius: '12px', border: '1px solid var(--border-passive)', marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-passive)', paddingBottom: '1rem', marginBottom: '1.25rem' }}>
           <div>
-<<<<<<< HEAD
-            <h2>Trip Budget & Cost Breakdown</h2>
-            <p className="text-muted text-sm" style={{ margin: 0 }}>
-              Automatic cost rollup across transport, stay, activities, and meals
-=======
             <span className="shell-badge hub">Budget Analysis</span>
             <h2 style={{ margin: '0.25rem 0' }}>{tripName} — Cost Breakdown</h2>
             <p className="text-sm text-muted" style={{ margin: 0 }}>
               Live aggregation of scheduled activities and custom expenses across {totalDays} days
->>>>>>> bb4224b4a0f25d6339e9ba76c6930bbf3ead484e
             </p>
           </div>
 
-<<<<<<< HEAD
-        {/* Budget Cards Overview */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-          <div style={{ padding: '1.25rem', backgroundColor: 'var(--bg-page)', borderRadius: '8px', border: '1px solid var(--border-passive)' }}>
-            <div className="text-xs text-muted">Total Estimated Cost</div>
-            <div style={{ fontSize: '24px', fontWeight: '600', color: 'var(--text-charcoal)' }}>$2,450.00</div>
-          </div>
-          <div style={{ padding: '1.25rem', backgroundColor: 'var(--bg-page)', borderRadius: '8px', border: '1px solid var(--border-passive)' }}>
-            <div className="text-xs text-muted">Target Budget</div>
-            <div style={{ fontSize: '24px', fontWeight: '600', color: 'var(--accent-green)' }}>$3,000.00</div>
-          </div>
-          <div style={{ padding: '1.25rem', backgroundColor: 'var(--bg-page)', borderRadius: '8px', border: '1px solid var(--border-passive)' }}>
-            <div className="text-xs text-muted">Daily Average</div>
-            <div style={{ fontSize: '24px', fontWeight: '600', color: 'var(--text-charcoal)' }}>$175.00/day</div>
-          </div>
-        </div>
-
-        {/* Breakdown by Category */}
-        <div style={{ padding: '1.5rem', backgroundColor: '#ffffff', borderRadius: '10px', border: '1px solid var(--border-passive)' }}>
-          <h4>Category Breakdown</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-              <span>Transport & Flights:</span>
-              <span style={{ fontWeight: '600' }}>$900.00 (37%)</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-              <span>Accommodations:</span>
-              <span style={{ fontWeight: '600' }}>$800.00 (33%)</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-              <span>Activities & Tours:</span>
-              <span style={{ fontWeight: '600' }}>$500.00 (20%)</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-              <span>Food & Dining:</span>
-              <span style={{ fontWeight: '600' }}>$250.00 (10%)</span>
-            </div>
-          </div>
-        </div>
-=======
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button
               type="button"
@@ -218,7 +172,6 @@ export default function TripBudgetPage() {
             </div>
           </div>
         )}
->>>>>>> bb4224b4a0f25d6339e9ba76c6930bbf3ead484e
       </div>
 
       {/* Over Budget Day Alerts */}
