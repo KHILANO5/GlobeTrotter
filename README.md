@@ -1,7 +1,5 @@
 # GlobeTrotter 🌍✈️
 
-# GlobeTrotter 🌍✈️
-
 **GlobeTrotter** is a comprehensive, full-stack travel planning platform built for modern explorers. Whether you're planning a weekend getaway, a multi-city backpacking adventure across Europe, or a complex family vacation, GlobeTrotter acts as your centralized travel hub. 
 
 We built GlobeTrotter to solve the chaos of travel planning—replacing scattered spreadsheets, disorganized email threads, and endless notes apps with a single, visually stunning, and highly organized dashboard. 
