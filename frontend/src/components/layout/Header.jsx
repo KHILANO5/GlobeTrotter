@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-export default function Header({ onMenuClick }) {
+export default function Header({ onMenuClick, sidebarOpen }) {
   const { user } = useAuth();
   const location = useLocation();
 
@@ -26,14 +26,29 @@ export default function Header({ onMenuClick }) {
 
   return (
     <header className="app-header">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexShrink: 0 }}>
         <button
           onClick={onMenuClick}
-          className="btn btn-ghost btn-sm"
-          style={{ display: 'inline-flex', padding: '6px 10px', flexShrink: 0 }}
-          aria-label="Toggle navigation menu"
+          className="header-toggle-btn"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            flexShrink: 0,
+            cursor: 'pointer',
+            border: '1px solid var(--border-passive)',
+            backgroundColor: 'var(--bg-card)',
+            color: 'var(--text-charcoal)',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+            transition: 'all 0.15s ease',
+          }}
+          title={sidebarOpen ? "Close side panel" : "Open side panel"}
+          aria-label="Toggle side panel"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <line x1="3" y1="18" x2="21" y2="18"></line>

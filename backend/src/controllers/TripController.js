@@ -88,17 +88,57 @@ const createTrip = async (req, res) => {
     const userId = req.user.userId;
     const { name, description, startDate, endDate, totalBudget, coverPhotoUrl } = req.body;
 
-    if (!name || !startDate || !endDate) {
+    // 1. Name Validation
+    if (!name || typeof name !== 'string' || !name.trim()) {
       return res.status(422).json({
         error: {
           code: 'VALIDATION_ERROR',
-          message: 'Trip name, start date, and end date are required.'
+          message: 'Trip name is required and cannot be empty.'
+        }
+      });
+    }
+
+    const trimmedName = name.trim();
+    if (trimmedName.length < 2 || trimmedName.length > 120) {
+      return res.status(422).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Trip name must be between 2 and 120 characters.'
+        }
+      });
+    }
+
+    // 2. Date Validation
+    if (!startDate || !endDate) {
+      return res.status(422).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Both start date and end date are required.'
         }
       });
     }
 
     const start = new Date(startDate);
     const end = new Date(endDate);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return res.status(422).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Invalid start or end date format.'
+        }
+      });
+    }
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (startDate < todayStr) {
+      return res.status(422).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Start date cannot be in the past. Please select today or a future date.'
+        }
+      });
+    }
 
     if (end < start) {
       return res.status(422).json({
@@ -108,6 +148,59 @@ const createTrip = async (req, res) => {
         }
       });
     }
+
+    const diffDays = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+    if (diffDays > 365) {
+      return res.status(422).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Maximum trip duration cannot exceed 365 days (1 year).'
+        }
+      });
+    }
+
+    // 3. Budget Validation
+    let sanitizedBudget = null;
+    if (totalBudget !== undefined && totalBudget !== null && totalBudget !== '') {
+      const parsedBudget = parseFloat(totalBudget);
+      if (isNaN(parsedBudget) || parsedBudget < 0) {
+        return res.status(422).json({
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Target budget must be a positive number or zero.'
+          }
+        });
+      }
+      if (parsedBudget > 10000000) {
+        return res.status(422).json({
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Target budget cannot exceed $10,000,000.'
+          }
+        });
+      }
+      sanitizedBudget = parsedBudget.toFixed(2);
+    }
+
+    // 4. Cover Photo URL Validation
+    let sanitizedPhotoUrl = null;
+    if (coverPhotoUrl && typeof coverPhotoUrl === 'string' && coverPhotoUrl.trim()) {
+      const trimmedUrl = coverPhotoUrl.trim();
+      if (!/^https?:\/\//i.test(trimmedUrl) && !trimmedUrl.startsWith('data:image/')) {
+        return res.status(422).json({
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Cover photo URL must start with http:// or https://'
+          }
+        });
+      }
+      sanitizedPhotoUrl = trimmedUrl.slice(0, 1000);
+    }
+
+    // 5. Description Sanitization
+    const sanitizedDesc = description && typeof description === 'string' 
+      ? description.trim().slice(0, 2000) 
+      : null;
 
     const now = new Date();
     let status = 'upcoming';
@@ -121,13 +214,13 @@ const createTrip = async (req, res) => {
       .insert(trips)
       .values({
         userId,
-        name: name.trim(),
-        description: description ? description.trim() : null,
+        name: trimmedName,
+        description: sanitizedDesc,
         startDate: startDate,
         endDate: endDate,
         status,
-        totalBudget: totalBudget ? String(totalBudget) : null,
-        coverPhotoUrl: coverPhotoUrl || null
+        totalBudget: sanitizedBudget,
+        coverPhotoUrl: sanitizedPhotoUrl
       })
       .returning();
 

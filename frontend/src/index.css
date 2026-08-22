@@ -44,8 +44,8 @@
   --ring-blue: rgba(59, 130, 246, 0.5);
   --focus-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
   --inset-shadow-dark: rgba(255, 255, 255, 0.2) 0px 0.5px 0px 0px inset,
-                       rgba(0, 0, 0, 0.2) 0px 0px 0px 0.5px inset,
-                       rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+    rgba(0, 0, 0, 0.2) 0px 0px 0px 0.5px inset,
+    rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
 
   /* Typography System */
   --font-system: "Camera Plain Variable", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -205,6 +205,8 @@ p {
 
 .app-sidebar {
   width: 250px;
+  min-width: 250px;
+  max-width: 250px;
   flex-shrink: 0;
   background-color: var(--bg-sidebar);
   border-right: 1px solid var(--border-passive);
@@ -214,7 +216,26 @@ p {
   position: sticky;
   top: 0;
   z-index: 40;
-  transition: transform 0.25s ease;
+  overflow: hidden;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.25s ease,
+    border-color 0.25s ease;
+  will-change: width, transform, opacity;
+}
+
+/* Desktop Collapsed Transition */
+@media (min-width: 901px) {
+  .app-sidebar.collapsed {
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+    border-right-color: transparent;
+  }
 }
 
 .app-main {
@@ -225,6 +246,7 @@ p {
   overflow-y: auto;
   height: 100vh;
   scrollbar-gutter: stable;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .app-header {
@@ -245,6 +267,16 @@ p {
   z-index: 30;
 }
 
+.header-toggle-btn:hover {
+  background-color: var(--bg-hover) !important;
+  border-color: rgba(28, 28, 28, 0.3) !important;
+  transform: translateY(-1px);
+}
+
+.header-toggle-btn:active {
+  transform: translateY(0);
+}
+
 .app-content {
   padding: 1.75rem 2rem;
   max-width: 1240px;
@@ -252,15 +284,34 @@ p {
   margin: 0 auto;
 }
 
+.sidebar-backdrop {
+  display: none;
+}
+
 @media (max-width: 900px) {
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.35);
+    z-index: 45;
+    cursor: pointer;
+  }
+
   .app-sidebar {
     position: fixed;
+    width: 260px;
+    min-width: 260px;
+    max-width: 260px;
     transform: translateX(-100%);
-    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+    z-index: 50;
   }
 
   .app-sidebar.open {
     transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .app-content {
@@ -454,7 +505,7 @@ p {
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, rgba(28, 28, 28, 0.75) 0%, rgba(13, 92, 70, 0.65) 100%),
-              url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&auto=format&fit=crop&q=80') center/cover no-repeat;
+    url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&auto=format&fit=crop&q=80') center/cover no-repeat;
   color: #ffffff;
   text-align: center;
   padding: 1.5rem;
@@ -872,7 +923,8 @@ p {
   margin-top: 1rem;
 }
 
-.db-details-table th, .db-details-table td {
+.db-details-table th,
+.db-details-table td {
   padding: 10px 14px;
   border-bottom: 1px solid var(--border-passive);
   text-align: left;
@@ -1064,3 +1116,22 @@ p {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
+
+.input-field.input-error {
+  border-color: #dc2626 !important;
+  background-color: rgba(239, 68, 68, 0.02);
+}
+
+.input-field.input-error:focus {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 const api = {
   getHeaders() {
@@ -13,7 +13,7 @@ const api = {
   async request(endpoint, options = {}) {
     const url = `${BASE_URL}${endpoint}`;
     const headers = this.getHeaders();
-    
+
     const config = {
       ...options,
       headers: {
@@ -29,7 +29,7 @@ const api = {
 
     try {
       const response = await fetch(url, config);
-      
+
       if (response.status === 204) {
         return null;
       }
@@ -39,12 +39,12 @@ const api = {
       if (contentType && contentType.includes('application/json')) {
         data = await response.json();
       }
-      
+
       if (!response.ok) {
         const errorMsg = data.error?.message || data.error || data.message || 'Something went wrong';
         throw new Error(errorMsg);
       }
-      
+
       return data;
     } catch (error) {
       console.error(`API Error on ${endpoint}:`, error.message);
