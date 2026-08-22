@@ -284,7 +284,20 @@ p {
   margin: 0 auto;
 }
 
+.sidebar-backdrop {
+  display: none;
+}
+
 @media (max-width: 900px) {
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.35);
+    z-index: 45;
+    cursor: pointer;
+  }
+
   .app-sidebar {
     position: fixed;
     width: 260px;

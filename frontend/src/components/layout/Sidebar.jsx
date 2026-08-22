@@ -25,14 +25,7 @@ export default function Sidebar({ isOpen, onClose }) {
         <div 
           className="sidebar-backdrop"
           onClick={onClose}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.35)',
-            backdropFilter: 'blur(2px)',
-            zIndex: 45,
-            transition: 'opacity 0.25s ease',
-          }}
+          aria-hidden="true"
         />
       )}
 
