@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const api = {
   getHeaders() {
@@ -29,10 +29,20 @@ const api = {
 
     try {
       const response = await fetch(url, config);
-      const data = await response.json();
+      
+      if (response.status === 204) {
+        return null;
+      }
+
+      let data = {};
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      }
       
       if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong');
+        const errorMsg = data.error?.message || data.error || data.message || 'Something went wrong';
+        throw new Error(errorMsg);
       }
       
       return data;
@@ -53,6 +63,28 @@ const api = {
       method: 'POST',
       body: isFormData ? body : JSON.stringify(body)
     });
+  },
+
+  put(endpoint, body, options = {}) {
+    const isFormData = body instanceof FormData;
+    return this.request(endpoint, {
+      ...options,
+      method: 'PUT',
+      body: isFormData ? body : JSON.stringify(body)
+    });
+  },
+
+  patch(endpoint, body, options = {}) {
+    const isFormData = body instanceof FormData;
+    return this.request(endpoint, {
+      ...options,
+      method: 'PATCH',
+      body: isFormData ? body : JSON.stringify(body)
+    });
+  },
+
+  delete(endpoint, options = {}) {
+    return this.request(endpoint, { ...options, method: 'DELETE' });
   }
 };
 
