@@ -13,4 +13,7 @@ router.delete('/:tripId', authenticateUser, TripController.deleteTrip);
 // Share endpoint
 router.post('/:tripId/share', authenticateUser, ShareController.createShare);
 
+// Copy public trip directly
+router.post('/:tripId/copy', authenticateUser, TripController.copyPublicTrip);
+
 module.exports = router;

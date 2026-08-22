@@ -1,6 +1,6 @@
 const { db } = require('../config/db');
-const { trips, tripStops, users } = require('../db/schema');
-const { eq, desc, asc, and, ilike, sql } = require('drizzle-orm');
+const { trips, tripStops, users, tripShares, tripStopActivities, tripCopies } = require('../db/schema');
+const { eq, desc, asc, and, ilike, sql, or, isNull } = require('drizzle-orm');
 
 // GET /api/v1/trips & /api/trips
 const getTrips = async (req, res) => {
@@ -326,10 +326,12 @@ const getCommunityTrips = async (req, res) => {
         ownerUsername: users.username,
         ownerPhotoUrl: users.photoUrl,
         ownerCity: users.city,
-        ownerCountry: users.country
+        ownerCountry: users.country,
+        shareToken: tripShares.shareToken
       })
       .from(trips)
       .leftJoin(users, eq(trips.userId, users.id))
+      .leftJoin(tripShares, and(eq(trips.id, tripShares.tripId), isNull(tripShares.revokedAt)))
       .where(whereClause)
       .orderBy(orderByClause)
       .limit(limitNum)
@@ -355,6 +357,7 @@ const getCommunityTrips = async (req, res) => {
         totalBudget: t.totalBudget,
         coverPhotoUrl: t.coverPhotoUrl,
         createdAt: t.createdAt,
+        shareToken: t.shareToken,
         owner: {
           id: t.ownerId,
           firstName: t.ownerFirstName,
@@ -472,12 +475,105 @@ const deleteTrip = async (req, res) => {
   }
 };
 
+// POST /api/v1/trips/:tripId/copy
+const copyPublicTrip = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { tripId } = req.params;
+
+    const [originalTrip] = await db
+      .select()
+      .from(trips)
+      .where(and(eq(trips.id, tripId), eq(trips.isPublic, true)))
+      .limit(1);
+
+    if (!originalTrip) {
+      return res.status(404).json({
+        error: { code: 'TRIP_NOT_FOUND', message: 'Public trip not found.' }
+      });
+    }
+
+    // 1. Clone trip
+    const [newTrip] = await db
+      .insert(trips)
+      .values({
+        userId,
+        name: `Copy of ${originalTrip.name}`,
+        description: originalTrip.description,
+        startDate: originalTrip.startDate,
+        endDate: originalTrip.endDate,
+        status: 'upcoming',
+        totalBudget: originalTrip.totalBudget,
+        coverPhotoUrl: originalTrip.coverPhotoUrl,
+        isPublic: false,
+      })
+      .returning();
+
+    // 2. Clone stops & their activities
+    const originalStops = await db
+      .select()
+      .from(tripStops)
+      .where(eq(tripStops.tripId, originalTrip.id))
+      .orderBy(asc(tripStops.sortOrder));
+
+    for (const stop of originalStops) {
+      const [newStop] = await db
+        .insert(tripStops)
+        .values({
+          tripId: newTrip.id,
+          cityId: stop.cityId,
+          type: stop.type,
+          title: stop.title,
+          description: stop.description,
+          startDate: stop.startDate,
+          endDate: stop.endDate,
+          budget: stop.budget,
+          sortOrder: stop.sortOrder,
+        })
+        .returning();
+
+      const originalStopActs = await db
+        .select()
+        .from(tripStopActivities)
+        .where(eq(tripStopActivities.tripStopId, stop.id));
+
+      for (const act of originalStopActs) {
+        await db.insert(tripStopActivities).values({
+          tripStopId: newStop.id,
+          activityId: act.activityId,
+          scheduledDate: act.scheduledDate,
+          scheduledTime: act.scheduledTime,
+          costOverride: act.costOverride,
+          sortOrder: act.sortOrder,
+        });
+      }
+    }
+
+    // 3. Record provenance
+    await db.insert(tripCopies).values({
+      sourceTripId: originalTrip.id,
+      copiedTripId: newTrip.id,
+      copiedBy: userId,
+    });
+
+    return res.status(201).json({
+      data: newTrip
+    });
+  } catch (err) {
+    console.error('Error copying public trip:', err);
+    return res.status(500).json({
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to copy trip.' }
+    });
+  }
+};
+
 module.exports = {
   getTrips,
   createTrip,
   getTripById,
   updateTrip,
   deleteTrip,
-  getCommunityTrips
+  getCommunityTrips,
+  copyPublicTrip
 };
 
