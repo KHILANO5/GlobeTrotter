@@ -1,0 +1,297 @@
+/* Lovable Design System Core Styles */
+
+:root {
+  --bg-page: #f7f4ed;
+  --bg-card: #fcfbf8;
+  
+  --text-charcoal: #1c1c1c;
+  --text-muted: #5f5f5d;
+  
+  --border-passive: #eceae4;
+  --border-interactive: rgba(28, 28, 28, 0.4);
+  
+  --primary-dark: #1c1c1c;
+  --primary-text-dark: #fcfbf8;
+  
+  --ring-blue: rgba(59, 130, 246, 0.5);
+  --focus-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
+  --inset-shadow-dark: rgba(255,255,255,0.2) 0px 0.5px 0px 0px inset, 
+                       rgba(0,0,0,0.2) 0px 0px 0px 0.5px inset, 
+                       rgba(0,0,0,0.05) 0px 1px 2px 0px;
+
+  --font-system: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-page);
+  color: var(--text-charcoal);
+  font-family: var(--font-system);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  width: 100%;
+  max-width: 1200px;
+  padding: 3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Headings */
+h1 {
+  font-size: 54px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -1.5px;
+  color: var(--text-charcoal);
+  margin: 0 0 1rem 0;
+}
+
+h2 {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.9px;
+  color: var(--text-charcoal);
+  margin: 0 0 0.75rem 0;
+}
+
+h3 {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--text-charcoal);
+  margin: 0 0 0.5rem 0;
+}
+
+p {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgba(28, 28, 28, 0.82);
+  margin: 0 0 1.5rem 0;
+}
+
+/* Containers & Cards */
+.glass-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-passive);
+  border-radius: 12px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 440px;
+  box-sizing: border-box;
+}
+
+/* Inputs & Form elements */
+.input-group {
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.input-field {
+  width: 100%;
+  padding: 8px 12px;
+  background-color: var(--bg-page);
+  color: var(--text-charcoal);
+  border: 1px solid var(--border-passive);
+  border-radius: 6px;
+  font-family: var(--font-system);
+  font-size: 16px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-field:focus {
+  border-color: rgba(28, 28, 28, 0.6);
+  box-shadow: var(--ring-blue) 0px 0px 0px 2px, var(--focus-shadow);
+}
+
+.input-field::placeholder {
+  color: var(--text-muted);
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input-wrapper .input-field {
+  padding-right: 42px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  border-radius: 4px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.password-toggle-btn:hover {
+  color: var(--text-charcoal);
+  background-color: rgba(28, 28, 28, 0.06);
+}
+
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 8px 16px;
+  font-family: var(--font-system);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: opacity 0.15s ease;
+}
+
+.btn:active {
+  opacity: 0.8;
+}
+
+.btn-primary {
+  background-color: var(--primary-dark);
+  color: var(--primary-text-dark);
+  box-shadow: var(--inset-shadow-dark);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-charcoal);
+  border: 1px solid var(--border-interactive);
+}
+
+/* Dashboards & Metrics */
+.dashboard-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  width: 100%;
+  max-width: 860px;
+}
+
+.dashboard-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-passive);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.stats-bar {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-item {
+  flex: 1;
+  padding: 1.5rem;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-passive);
+  border-radius: 8px;
+}
+
+.stat-value {
+  font-size: 44px;
+  font-weight: 600;
+  letter-spacing: -1.2px;
+  color: var(--text-charcoal);
+  line-height: 1.1;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* User Directory Table */
+.db-details-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.db-details-table th, .db-details-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-passive);
+  text-align: left;
+  font-size: 15px;
+}
+
+.db-details-table th {
+  color: var(--text-muted);
+  font-weight: 400;
+  background-color: rgba(28, 28, 28, 0.02);
+}
+
+.db-details-table td {
+  color: var(--text-charcoal);
+}
+
+/* Status Indicator */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background-color: rgba(28, 28, 28, 0.03);
+  border: 1px solid var(--border-passive);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--text-muted);
+}
+
+.status-dot.active {
+  background-color: #10b981;
+}
+
+.status-dot.inactive {
+  background-color: #ef4444;
+}
+
+.status-label {
+  font-size: 13px;
+  color: var(--text-charcoal);
+}

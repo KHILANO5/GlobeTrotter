@@ -1,0 +1,17 @@
+{
+  "name": "auth_module_root",
+  "version": "1.0.0",
+  "description": "Auth Module Full-Stack Application with Node, Express, React, and PostgreSQL on Render",
+  "main": "index.js",
+  "scripts": {
+    "install:backend": "npm install --prefix backend",
+    "install:frontend": "npm install --prefix frontend",
+    "install:all": "npm install && npm run install:backend && npm run install:frontend",
+    "server": "npm run dev --prefix backend",
+    "client": "npm run dev --prefix frontend",
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue.bold,green.bold\" \"npm run server\" \"npm run client\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

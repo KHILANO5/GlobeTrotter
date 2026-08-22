@@ -1,0 +1,53 @@
+# Environment Variables (CRITICAL: Never commit secrets)
+.env
+.env.local
+.env.*.local
+*.env
+backend/.env
+frontend/.env
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Production build outputs
+frontend/dist/
+frontend/dist-ssr/
+dist/
+build/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary / OS files
+*.tmp
+*.bak
+
+# Documentation & Design
+design.md
+DESIGN.md
+
+# Agent & Skills
+.agents/
+agent/
+agents/
+skills/
+skills-lock.json
+skill-lock.json
+
+
