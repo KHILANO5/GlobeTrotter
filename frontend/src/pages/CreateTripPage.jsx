@@ -1,37 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
-
-const QUICK_INSPIRATIONS = [
-  {
-    name: '🌸 Tokyo & Kyoto Spring Loop',
-    description: 'Multi-city journey exploring ancient temples, bullet trains, and modern Japanese culture.',
-    durationDays: 10,
-    budget: 2800,
-    coverPhotoUrl: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=800&auto=format&fit=crop&q=80',
-  },
-  {
-    name: '🥐 Classic Paris & Rome Grand Tour',
-    description: 'Art, architecture, and world-class gastronomy across France and Italy.',
-    durationDays: 12,
-    budget: 3500,
-    coverPhotoUrl: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&auto=format&fit=crop&q=80',
-  },
-  {
-    name: '🏝️ Bali Island Sanctuary',
-    description: 'Relaxation, surfing, temple hikes, and cultural immersion in Ubud and Seminyak.',
-    durationDays: 8,
-    budget: 1500,
-    coverPhotoUrl: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&auto=format&fit=crop&q=80',
-  },
-  {
-    name: '🗽 New York & East Coast Highlights',
-    description: 'Iconic skylines, Broadway theatre, museums, and food markets.',
-    durationDays: 7,
-    budget: 2200,
-    coverPhotoUrl: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&auto=format&fit=crop&q=80',
-  },
-];
 
 export default function CreateTripPage() {
   const navigate = useNavigate();
@@ -49,8 +18,29 @@ export default function CreateTripPage() {
     coverPhotoUrl: '',
   });
 
+  const [popularCities, setPopularCities] = useState([]);
+  const [loadingCities, setLoadingCities] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Fetch real-time destinations from the database
+  useEffect(() => {
+    fetchDestinations();
+  }, []);
+
+  const fetchDestinations = async () => {
+    try {
+      setLoadingCities(true);
+      const res = await api.get('/cities?sort=popularityScore:desc&pageSize=8');
+      if (res.data && Array.isArray(res.data)) {
+        setPopularCities(res.data);
+      }
+    } catch (err) {
+      console.error('Error fetching destinations from DB:', err);
+    } finally {
+      setLoadingCities(false);
+    }
+  };
 
   // Live calculation of duration
   const tripDuration = useMemo(() => {
@@ -63,18 +53,18 @@ export default function CreateTripPage() {
     return `${days} Days / ${days - 1} Nights`;
   }, [formData.startDate, formData.endDate]);
 
-  const handleApplyInspiration = (insp) => {
-    const start = new Date();
-    const end = new Date(Date.now() + insp.durationDays * 24 * 60 * 60 * 1000);
-    setFormData({
-      ...formData,
-      name: insp.name,
-      description: insp.description,
-      startDate: start.toISOString().split('T')[0],
-      endDate: end.toISOString().split('T')[0],
-      totalBudget: String(insp.budget),
-      coverPhotoUrl: insp.coverPhotoUrl,
-    });
+  const handleApplyCityInspiration = (city) => {
+    const defaultDays = 7;
+    const estimatedDailyCost = (city.costIndex || 2) * 120;
+    const calculatedBudget = estimatedDailyCost * defaultDays;
+
+    setFormData(prev => ({
+      ...prev,
+      name: `Journey to ${city.name}`,
+      description: city.description || `Exploring the culture, sights, and cuisine of ${city.name}, ${city.country}.`,
+      coverPhotoUrl: city.imageUrl || prev.coverPhotoUrl,
+      totalBudget: prev.totalBudget || String(calculatedBudget),
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -114,10 +104,9 @@ export default function CreateTripPage() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem', borderBottom: '1px solid var(--border-passive)', paddingBottom: '1.25rem' }}>
           <div>
-            <span className="shell-badge green">Step 1 • Initial Setup</span>
-            <h2 style={{ margin: '0.25rem 0' }}>Plan a New Trip</h2>
+            <h2 style={{ margin: '0 0 0.25rem 0' }}>Plan a New Trip</h2>
             <p className="text-muted text-sm" style={{ margin: 0 }}>
-              Set your journey name, dates, and budget — then construct your custom stops in the Itinerary Builder
+              Set up your journey title, travel dates, and target budget to start planning
             </p>
           </div>
           <Link to="/dashboard" className="btn btn-ghost btn-sm">
@@ -125,24 +114,30 @@ export default function CreateTripPage() {
           </Link>
         </div>
 
-        {/* Quick Inspiration Pills */}
-        <div style={{ marginBottom: '1.75rem', backgroundColor: 'var(--bg-page)', padding: '1rem', borderRadius: '10px', border: '1px solid var(--border-passive)' }}>
-          <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '0.6rem' }}>
-            ✨ Quick Inspiration Ideas (Click to auto-fill):
+        {/* Realtime Popular Destinations from DB */}
+        <div style={{ marginBottom: '1.75rem', backgroundColor: 'var(--bg-page)', padding: '1.15rem', borderRadius: '10px', border: '1px solid var(--border-passive)' }}>
+          <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '0.6rem', color: 'var(--text-charcoal)' }}>
+            ✨ Popular Destinations (Click to auto-fill from live database):
           </div>
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            {QUICK_INSPIRATIONS.map(insp => (
-              <button
-                key={insp.name}
-                type="button"
-                onClick={() => handleApplyInspiration(insp)}
-                className="filter-pill"
-                style={{ fontSize: '12px', padding: '6px 12px' }}
-              >
-                {insp.name}
-              </button>
-            ))}
-          </div>
+          
+          {loadingCities ? (
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Loading top destinations...</div>
+          ) : (
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {popularCities.map(city => (
+                <button
+                  key={city.id}
+                  type="button"
+                  onClick={() => handleApplyCityInspiration(city)}
+                  className="filter-pill"
+                  style={{ fontSize: '12px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                  title={`Cost Index: ${city.costIndex}/5 • Region: ${city.region}`}
+                >
+                  📍 {city.name}, {city.country}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {error && (
@@ -159,7 +154,7 @@ export default function CreateTripPage() {
               id="name"
               type="text"
               className="input-field"
-              placeholder="e.g. Japan Spring Loop 2026, Euro Summer Voyage..."
+              placeholder="e.g. Summer in Kyoto, European Highlights..."
               value={formData.name}
               onChange={e => setFormData({ ...formData, name: e.target.value })}
               required
@@ -242,21 +237,13 @@ export default function CreateTripPage() {
           {/* Submit Action */}
           <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
             <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={loading}>
-              {loading ? 'Creating Trip...' : 'Create Trip & Proceed to Itinerary Builder →'}
+              {loading ? 'Creating Trip...' : 'Create Trip & Proceed to Builder →'}
             </button>
             <Link to="/dashboard" className="btn btn-secondary">
               Cancel
             </Link>
           </div>
         </form>
-
-        {/* Tree Hierarchy Path info */}
-        <div className="shell-box" style={{ marginTop: '2.5rem', textAlign: 'center' }}>
-          <h4>🗺️ Creation Funnel Path</h4>
-          <p className="text-sm text-muted" style={{ margin: '0.5rem 0 0' }}>
-            <strong>Create Trip</strong> → <strong>Itinerary Builder</strong> (Add stops & activities) → <strong>Itinerary View</strong> (Sub-Hub fanning out to Budget, Calendar & Share).
-          </p>
-        </div>
       </div>
     </div>
   );
