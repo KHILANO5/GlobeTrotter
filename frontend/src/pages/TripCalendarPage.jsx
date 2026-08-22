@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { CalendarIcon, MapPinIcon, ClockIcon, EditIcon, PlusIcon } from '../components/common/Icons';
 
 export default function TripCalendarPage() {
   const { tripId } = useParams();
@@ -68,7 +69,9 @@ export default function TripCalendarPage() {
   if (error || !calendarData) {
     return (
       <div className="shell-container" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '36px', marginBottom: '0.5rem' }}>📅</div>
+        <div style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'center' }}>
+          <CalendarIcon size={36} style={{ color: 'var(--text-muted)' }} />
+        </div>
         <h3>Calendar Not Available</h3>
         <p className="text-muted text-sm" style={{ maxWidth: '400px', margin: '0.5rem auto 1.5rem' }}>
           {error || 'Could not load calendar data.'}
@@ -107,14 +110,19 @@ export default function TripCalendarPage() {
               <span className="nav-badge green" style={{ fontWeight: '700' }}>{days.length} Days</span>
             </div>
             <h2 style={{ margin: '0 0 0.25rem 0' }}>{tripName} — Calendar & Timeline</h2>
-            <p className="text-sm text-muted" style={{ margin: 0 }}>
-              📅 {new Date(startDate).toLocaleDateString()} – {new Date(endDate).toLocaleDateString()} • {totalActivities} {totalActivities === 1 ? 'Event' : 'Events'} Scheduled
+            <p className="text-sm text-muted" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <CalendarIcon size={13} />
+                <span>{new Date(startDate).toLocaleDateString()} – {new Date(endDate).toLocaleDateString()}</span>
+              </span>
+              <span>• {totalActivities} {totalActivities === 1 ? 'Event' : 'Events'} Scheduled</span>
             </p>
           </div>
 
           <div style={{ display: 'flex', gap: '0.6rem' }}>
-            <Link to={`/trips/${tripId}/builder`} className="btn btn-secondary btn-sm">
-              ✏️ Edit in Builder
+            <Link to={`/trips/${tripId}/builder`} className="btn btn-secondary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+              <EditIcon size={13} />
+              <span>Edit in Builder</span>
             </Link>
             <Link to={`/trips/${tripId}/itinerary`} className="btn btn-primary btn-sm">
               ← Itinerary Hub
@@ -174,8 +182,9 @@ export default function TripCalendarPage() {
                   {new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                 </div>
               </div>
-              <span className="text-muted text-sm" style={{ fontSize: '12px', fontWeight: '500' }}>
-                📍 {day.stopTitle}
+              <span className="text-muted text-sm" style={{ fontSize: '12px', fontWeight: '500', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                <MapPinIcon size={12} />
+                <span>{day.stopTitle}</span>
               </span>
             </div>
 
@@ -193,8 +202,9 @@ export default function TripCalendarPage() {
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
-                      <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent-terra)' }}>
-                        ⏰ {item.time}
+                      <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent-terra)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                        <ClockIcon size={11} />
+                        <span>{item.time}</span>
                       </span>
                       <span className="nav-badge" style={{ fontSize: '9px', textTransform: 'capitalize' }}>
                         {item.category}
@@ -211,8 +221,9 @@ export default function TripCalendarPage() {
               ) : (
                 <div style={{ padding: '1.75rem 0.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '12px', fontStyle: 'italic', display: 'flex', flexDirection: 'column', gap: '0.4rem', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
                   <span>No activities scheduled</span>
-                  <Link to={`/trips/${tripId}/builder`} style={{ color: 'var(--primary-dark)', fontSize: '11px', fontWeight: '600' }}>
-                    + Add in Builder
+                  <Link to={`/trips/${tripId}/builder`} style={{ color: 'var(--primary-dark)', fontSize: '11px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                    <PlusIcon size={11} />
+                    <span>Add in Builder</span>
                   </Link>
                 </div>
               )}

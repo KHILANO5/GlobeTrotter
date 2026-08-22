@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ShareModal from '../components/modals/ShareModal';
+import { CalendarIcon, MapPinIcon, TicketIcon, EditIcon, ShareIcon, BudgetIcon, GlobeIcon, PlusIcon, ClockIcon } from '../components/common/Icons';
 
 export default function ItineraryViewPage() {
   const { tripId } = useParams();
@@ -117,23 +118,37 @@ export default function ItineraryViewPage() {
               <span className="nav-badge green" style={{ fontWeight: '700' }}>{days.length} Days Itinerary</span>
             </div>
             <h2 style={{ margin: '0 0 0.25rem 0' }}>{tripName}</h2>
-            <p className="text-sm text-muted" style={{ margin: 0 }}>
-              📅 {new Date(startDate).toLocaleDateString()} – {new Date(endDate).toLocaleDateString()}
-              {stops.length > 0 && ` • 📍 ${stops.length} Stops`}
-              {totalActivitiesCount > 0 && ` • 🎟️ ${totalActivitiesCount} Experiences`}
+            <p className="text-sm text-muted" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <CalendarIcon size={13} />
+                <span>{new Date(startDate).toLocaleDateString()} – {new Date(endDate).toLocaleDateString()}</span>
+              </span>
+              {stops.length > 0 && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                  • <MapPinIcon size={12} /> {stops.length} {stops.length === 1 ? 'Stop' : 'Stops'}
+                </span>
+              )}
+              {totalActivitiesCount > 0 && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                  • <TicketIcon size={12} /> {totalActivitiesCount} Experiences
+                </span>
+              )}
             </p>
           </div>
 
           <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
-            <Link to={`/trips/${tripId}/builder`} className="btn btn-secondary btn-sm">
-              ✏️ Edit in Builder
+            <Link to={`/trips/${tripId}/builder`} className="btn btn-secondary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+              <EditIcon size={13} />
+              <span>Edit in Builder</span>
             </Link>
             <button
               type="button"
               className="btn btn-primary btn-sm"
               onClick={() => setIsShareModalOpen(true)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}
             >
-              🔗 Share Trip
+              <ShareIcon size={13} />
+              <span>Share Trip</span>
             </button>
           </div>
         </div>
@@ -151,10 +166,12 @@ export default function ItineraryViewPage() {
           }}
         >
           <Link to={`/trips/${tripId}/budget`} className="btn btn-secondary btn-sm" style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-            💰 Budget & Breakdown
+            <BudgetIcon size={14} />
+            <span>Budget & Breakdown</span>
           </Link>
           <Link to={`/trips/${tripId}/calendar`} className="btn btn-secondary btn-sm" style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-            📅 Calendar Timeline
+            <CalendarIcon size={14} />
+            <span>Calendar Timeline</span>
           </Link>
           <button
             type="button"
@@ -162,10 +179,12 @@ export default function ItineraryViewPage() {
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
             onClick={() => setIsShareModalOpen(true)}
           >
-            🌐 Public View Link
+            <GlobeIcon size={14} />
+            <span>Public View Link</span>
           </button>
-          <Link to={`/trips/${tripId}/builder`} className="btn btn-ghost btn-sm" style={{ textAlign: 'center' }}>
-            ➕ Add Stops
+          <Link to={`/trips/${tripId}/builder`} className="btn btn-ghost btn-sm" style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+            <PlusIcon size={13} />
+            <span>Add Stops</span>
           </Link>
         </div>
       </div>
@@ -281,7 +300,9 @@ export default function ItineraryViewPage() {
                   <span style={{ fontWeight: '600', fontSize: '15px', color: 'var(--text-charcoal)' }}>
                     {new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
-                  <span className="text-muted text-sm">• 📍 {day.stopTitle}</span>
+                  <span className="text-muted text-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                    • <MapPinIcon size={12} /> {day.stopTitle}
+                  </span>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -313,8 +334,9 @@ export default function ItineraryViewPage() {
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--accent-terra)' }}>
-                              ⏰ {act.scheduledTime || '09:00'}
+                            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--accent-terra)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                              <ClockIcon size={12} />
+                              <span>{act.scheduledTime || '09:00'}</span>
                             </span>
                             <div>
                               <div style={{ fontWeight: '600', fontSize: '14px', color: 'var(--text-charcoal)' }}>{act.name}</div>

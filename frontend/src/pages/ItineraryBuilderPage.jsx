@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import CitySearchModal from '../components/modals/CitySearchModal';
 import ActivitySearchModal from '../components/modals/ActivitySearchModal';
+import { MapPinIcon, CalendarIcon, CompassIcon, BuildingIcon, FlightIcon, ClockIcon, TicketIcon, PlusIcon } from '../components/common/Icons';
 
 export default function ItineraryBuilderPage() {
   const { tripId } = useParams();
@@ -179,7 +180,9 @@ export default function ItineraryBuilderPage() {
   if (error || !trip) {
     return (
       <div className="shell-container" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '36px', marginBottom: '0.5rem' }}>🧭</div>
+        <div style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'center' }}>
+          <CompassIcon size={36} style={{ color: 'var(--text-muted)' }} />
+        </div>
         <h3>Trip Not Found</h3>
         <p className="text-muted text-sm" style={{ maxWidth: '400px', margin: '0.5rem auto 1.5rem' }}>
           {error || 'Please check the trip ID or choose an active trip from your list.'}
@@ -196,11 +199,18 @@ export default function ItineraryBuilderPage() {
     );
   }
 
-  const stopTypeIcon = {
-    city_stop: '🏙️',
-    travel: '✈️',
-    lodging: '🏨',
-    activity_block: '🎯',
+  const renderStopTypeIcon = (type) => {
+    switch (type) {
+      case 'travel':
+        return <FlightIcon size={16} style={{ color: 'var(--accent-terra)' }} />;
+      case 'lodging':
+        return <BuildingIcon size={16} style={{ color: 'var(--accent-terra)' }} />;
+      case 'activity_block':
+        return <TicketIcon size={16} style={{ color: 'var(--accent-terra)' }} />;
+      case 'city_stop':
+      default:
+        return <MapPinIcon size={16} style={{ color: 'var(--accent-terra)' }} />;
+    }
   };
 
   return (
@@ -224,9 +234,12 @@ export default function ItineraryBuilderPage() {
               <span className="nav-badge" style={{ textTransform: 'capitalize' }}>{trip.status}</span>
             </div>
             <h2 style={{ margin: '0 0 0.25rem 0' }}>{trip.name}</h2>
-            <p className="text-sm text-muted" style={{ margin: 0 }}>
-              📅 {new Date(trip.startDate).toLocaleDateString()} – {new Date(trip.endDate).toLocaleDateString()}
-              {trip.totalBudget && ` • Target Budget: $${parseFloat(trip.totalBudget).toLocaleString()}`}
+            <p className="text-sm text-muted" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <CalendarIcon size={13} />
+                <span>{new Date(trip.startDate).toLocaleDateString()} – {new Date(trip.endDate).toLocaleDateString()}</span>
+              </span>
+              {trip.totalBudget && <span>• Target Budget: <strong>${parseFloat(trip.totalBudget).toLocaleString()}</strong></span>}
             </p>
           </div>
 
@@ -237,7 +250,8 @@ export default function ItineraryBuilderPage() {
               onClick={() => setIsCityModalOpen(true)}
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
-              + Add Stop / Section
+              <PlusIcon size={14} />
+              <span>Add Stop / Section</span>
             </button>
             <Link to={`/trips/${tripId}/itinerary`} className="btn btn-secondary btn-sm">
               Itinerary View →
@@ -261,15 +275,19 @@ export default function ItineraryBuilderPage() {
               type="button"
               className="btn btn-secondary btn-sm"
               onClick={() => setIsCityModalOpen(true)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
             >
-              + Add Another Section
+              <PlusIcon size={13} />
+              <span>Add Another Section</span>
             </button>
           )}
         </div>
 
         {stops.length === 0 ? (
           <div className="shell-container" style={{ padding: '3.5rem 2rem', textAlign: 'center' }}>
-            <div style={{ fontSize: '44px', marginBottom: '0.75rem' }}>📍</div>
+            <div style={{ marginBottom: '0.75rem', display: 'flex', justifyContent: 'center' }}>
+              <MapPinIcon size={44} style={{ color: 'var(--text-muted)' }} />
+            </div>
             <h3 style={{ margin: '0 0 0.5rem 0' }}>No Stops Added Yet</h3>
             <p className="text-muted text-sm" style={{ maxWidth: '460px', margin: '0 auto 1.5rem' }}>
               Your journey is waiting to be built! Add your first destination city or travel leg to begin planning activities.
@@ -278,9 +296,10 @@ export default function ItineraryBuilderPage() {
               type="button"
               className="btn btn-primary"
               onClick={() => setIsCityModalOpen(true)}
-              style={{ padding: '10px 20px', fontSize: '14px' }}
+              style={{ padding: '10px 20px', fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
-              + Add First Destination Stop
+              <PlusIcon size={14} />
+              <span>Add First Destination Stop</span>
             </button>
           </div>
         ) : (
@@ -301,18 +320,22 @@ export default function ItineraryBuilderPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', borderBottom: '1px solid var(--border-passive)', paddingBottom: '0.85rem' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '20px' }}>{stopTypeIcon[stop.type] || '📍'}</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '6px', backgroundColor: 'var(--bg-page)', border: '1px solid var(--border-passive)' }}>
+                        {renderStopTypeIcon(stop.type)}
+                      </span>
                       <h4 style={{ margin: 0, fontSize: '16px', color: 'var(--text-charcoal)' }}>
                         Section {index + 1}: {stop.title}
                       </h4>
                       {stop.cityName && (
-                        <span className="nav-badge green" style={{ fontSize: '11px', fontWeight: '600' }}>
-                          📍 {stop.cityName}{stop.cityCountry ? `, ${stop.cityCountry}` : ''}
+                        <span className="nav-badge green" style={{ fontSize: '11px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                          <MapPinIcon size={11} />
+                          <span>{stop.cityName}{stop.cityCountry ? `, ${stop.cityCountry}` : ''}</span>
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-muted" style={{ margin: 0, fontSize: '12px' }}>
-                      📅 {new Date(stop.startDate).toLocaleDateString()} – {new Date(stop.endDate).toLocaleDateString()}
+                    <p className="text-sm text-muted" style={{ margin: 0, fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                      <CalendarIcon size={12} />
+                      <span>{new Date(stop.startDate).toLocaleDateString()} – {new Date(stop.endDate).toLocaleDateString()}</span>
                       {stop.budget && ` • Section Budget: $${parseFloat(stop.budget).toLocaleString()}`}
                     </p>
                   </div>
@@ -366,10 +389,11 @@ export default function ItineraryBuilderPage() {
                     <button
                       type="button"
                       className="btn btn-secondary btn-sm"
-                      style={{ fontSize: '12px', padding: '5px 12px' }}
+                      style={{ fontSize: '12px', padding: '5px 12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                       onClick={() => handleOpenActivityModal(stop)}
                     >
-                      + Assign Activity
+                      <PlusIcon size={12} />
+                      <span>Assign Activity</span>
                     </button>
                   </div>
 
@@ -389,8 +413,9 @@ export default function ItineraryBuilderPage() {
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--accent-terra)' }}>
-                              ⏰ {act.scheduledTime ? act.scheduledTime.slice(0, 5) : '09:00'}
+                            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--accent-terra)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                              <ClockIcon size={12} />
+                              <span>{act.scheduledTime ? act.scheduledTime.slice(0, 5) : '09:00'}</span>
                             </span>
                             <span style={{ fontWeight: '500', fontSize: '14px', color: 'var(--text-charcoal)' }}>
                               {act.name}
@@ -450,9 +475,15 @@ export default function ItineraryBuilderPage() {
         </Link>
 
         <div style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <span>📍 <strong>{stops.length}</strong> {stops.length === 1 ? 'Stop' : 'Stops'}</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <MapPinIcon size={13} />
+            <span><strong>{stops.length}</strong> {stops.length === 1 ? 'Stop' : 'Stops'}</span>
+          </span>
           <span>•</span>
-          <span>🎟️ <strong>{totalActivitiesCount}</strong> {totalActivitiesCount === 1 ? 'Activity' : 'Activities'}</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <TicketIcon size={13} />
+            <span><strong>{totalActivitiesCount}</strong> {totalActivitiesCount === 1 ? 'Activity' : 'Activities'}</span>
+          </span>
         </div>
 
         <Link to={`/trips/${tripId}/itinerary`} className="btn btn-primary" style={{ padding: '8px 18px', fontSize: '14px' }}>

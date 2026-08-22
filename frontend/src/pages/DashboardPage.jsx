@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { CalendarIcon, LuggageIcon } from '../components/common/Icons';
 
 // Curated destination imagery for regional selections
 const CITY_IMAGES = {
@@ -439,8 +440,9 @@ export default function DashboardPage() {
                       </span>
                     </div>
 
-                    <div className="trip-card-dates">
-                      📅 {new Date(trip.startDate).toLocaleDateString()} – {new Date(trip.endDate).toLocaleDateString()}
+                    <div className="trip-card-dates" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <CalendarIcon size={12} />
+                      <span>{new Date(trip.startDate).toLocaleDateString()} – {new Date(trip.endDate).toLocaleDateString()}</span>
                     </div>
 
                     <p className="trip-card-desc">
@@ -462,7 +464,9 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="shell-container" style={{ padding: '2.5rem 1rem' }}>
-            <div style={{ fontSize: '32px', marginBottom: '0.5rem' }}>🧳</div>
+            <div style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'center' }}>
+              <LuggageIcon size={32} style={{ color: 'var(--text-muted)' }} />
+            </div>
             <h4>No trips found matching filter</h4>
             <p className="text-muted text-sm" style={{ margin: '0.25rem 0 1rem' }}>
               Start building your first custom journey with stops and activities.

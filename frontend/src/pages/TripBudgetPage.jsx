@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ExpenseModal from '../components/modals/ExpenseModal';
+import { BudgetIcon, FlightIcon, BuildingIcon, TicketIcon, UtensilsIcon, TagIcon, AlertCircleIcon, PlusIcon } from '../components/common/Icons';
 
 export default function TripBudgetPage() {
   const { tripId } = useParams();
@@ -97,7 +98,9 @@ export default function TripBudgetPage() {
   if (error || !budgetData) {
     return (
       <div className="shell-container" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '36px', marginBottom: '0.5rem' }}>💰</div>
+        <div style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'center' }}>
+          <BudgetIcon size={36} style={{ color: 'var(--text-muted)' }} />
+        </div>
         <h3>Budget Not Available</h3>
         <p className="text-muted text-sm" style={{ maxWidth: '400px', margin: '0.5rem auto 1.5rem' }}>
           {error || 'Could not load budget data.'}
@@ -120,12 +123,20 @@ export default function TripBudgetPage() {
   const budgetProgress = totalBudget ? Math.min(100, actualPercentage) : null;
   const isOverBudget = totalBudget && totalEstimatedCost > totalBudget;
 
-  const categoryIcons = {
-    transport: '✈️',
-    stay: '🏨',
-    activities: '🎟️',
-    meals: '🍽️',
-    other: '🏷️',
+  const renderCategoryIcon = (category) => {
+    switch (category) {
+      case 'transport':
+        return <FlightIcon size={22} style={{ color: 'var(--accent-terra)' }} />;
+      case 'stay':
+        return <BuildingIcon size={22} style={{ color: 'var(--accent-terra)' }} />;
+      case 'activities':
+        return <TicketIcon size={22} style={{ color: 'var(--accent-terra)' }} />;
+      case 'meals':
+        return <UtensilsIcon size={22} style={{ color: 'var(--accent-terra)' }} />;
+      case 'other':
+      default:
+        return <TagIcon size={22} style={{ color: 'var(--accent-terra)' }} />;
+    }
   };
 
   return (
@@ -147,8 +158,10 @@ export default function TripBudgetPage() {
               type="button"
               className="btn btn-primary btn-sm"
               onClick={() => setIsExpenseModalOpen(true)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}
             >
-              + Add Expense
+              <PlusIcon size={13} />
+              <span>Add Expense</span>
             </button>
             <Link to={`/trips/${tripId}/itinerary`} className="btn btn-secondary btn-sm">
               ← Itinerary View
@@ -191,8 +204,9 @@ export default function TripBudgetPage() {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '0.4rem', fontWeight: '600' }}>
               <span>Budget Consumption</span>
-              <span style={{ color: isOverBudget ? '#dc2626' : 'var(--accent-green)' }}>
-                {actualPercentage}% {isOverBudget && '(⚠️ Exceeds target budget)'}
+              <span style={{ color: isOverBudget ? '#dc2626' : 'var(--accent-green)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                {isOverBudget && <AlertCircleIcon size={13} />}
+                <span>{actualPercentage}% {isOverBudget && '(Exceeds target budget)'}</span>
               </span>
             </div>
             <div style={{ width: '100%', height: '8px', backgroundColor: 'rgba(28,28,28,0.08)', borderRadius: '9999px', overflow: 'hidden' }}>
@@ -211,8 +225,9 @@ export default function TripBudgetPage() {
 
       {/* Over Budget Day Alerts */}
       {overBudgetDays.length > 0 && (
-        <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)', padding: '1rem 1.25rem', borderRadius: '10px', marginBottom: '1.5rem', color: '#dc2626' }}>
-          <strong>⚠️ Over-Budget Day Alert:</strong> Activities scheduled on <strong>{overBudgetDays.join(', ')}</strong> exceed your daily budget allowance!
+        <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)', padding: '1rem 1.25rem', borderRadius: '10px', marginBottom: '1.5rem', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <AlertCircleIcon size={16} />
+          <div><strong>Over-Budget Day Alert:</strong> Activities scheduled on <strong>{overBudgetDays.join(', ')}</strong> exceed your daily budget allowance!</div>
         </div>
       )}
 
@@ -233,8 +248,8 @@ export default function TripBudgetPage() {
                 boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
               }}
             >
-              <div style={{ fontSize: '24px', marginBottom: '0.35rem' }}>
-                {categoryIcons[category] || '🏷️'}
+              <div style={{ marginBottom: '0.5rem', display: 'flex', alignItems: 'center' }}>
+                {renderCategoryIcon(category)}
               </div>
               <div style={{ textTransform: 'capitalize', fontWeight: '600', fontSize: '14px', color: 'var(--text-charcoal)' }}>
                 {category}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { MapPinIcon, CalendarIcon, CompassIcon, AlertCircleIcon } from '../components/common/Icons';
 
 export default function CreateTripPage() {
   const navigate = useNavigate();
@@ -258,8 +259,9 @@ export default function CreateTripPage() {
 
         {/* Realtime Popular Destinations from DB */}
         <div style={{ marginBottom: '1.75rem', backgroundColor: 'var(--bg-page)', padding: '1.15rem', borderRadius: '10px', border: '1px solid var(--border-passive)' }}>
-          <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '0.6rem', color: 'var(--text-charcoal)' }}>
-            ✨ Popular Destinations (Click to auto-fill from live database):
+          <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '0.6rem', color: 'var(--text-charcoal)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <CompassIcon size={15} style={{ color: 'var(--accent-terra)' }} />
+            <span>Popular Destinations (Click to auto-fill from live database):</span>
           </div>
           
           {loadingCities ? (
@@ -272,10 +274,11 @@ export default function CreateTripPage() {
                   type="button"
                   onClick={() => handleApplyCityInspiration(city)}
                   className="filter-pill"
-                  style={{ fontSize: '12px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
+                  style={{ fontSize: '12px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
                   title={`Cost Index: ${city.costIndex}/5 • Region: ${city.region}`}
                 >
-                  📍 {city.name}, {city.country}
+                  <MapPinIcon size={12} style={{ color: 'var(--accent-terra)' }} />
+                  <span>{city.name}, {city.country}</span>
                 </button>
               ))}
             </div>
@@ -283,8 +286,9 @@ export default function CreateTripPage() {
         </div>
 
         {generalError && (
-          <div style={{ padding: '0.85rem 1.15rem', backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', color: '#dc2626', marginBottom: '1.5rem', fontSize: '14px' }}>
-            ⚠️ {generalError}
+          <div style={{ padding: '0.85rem 1.15rem', backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', color: '#dc2626', marginBottom: '1.5rem', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <AlertCircleIcon size={16} />
+            <span>{generalError}</span>
           </div>
         )}
 
@@ -375,7 +379,8 @@ export default function CreateTripPage() {
                 fontWeight: '600',
               }}
             >
-              {durationInfo.valid ? '🗓️ Calculated Duration:' : '⚠️ Date Range:'} {durationInfo.text}
+              {durationInfo.valid ? <CalendarIcon size={14} /> : <AlertCircleIcon size={14} />}
+              <span>{durationInfo.valid ? 'Calculated Duration:' : 'Date Range:'} {durationInfo.text}</span>
             </div>
           </div>
 
