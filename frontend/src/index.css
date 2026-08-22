@@ -1000,3 +1000,22 @@ p {
   border-color: rgba(28, 28, 28, 0.6);
   box-shadow: var(--ring-blue) 0px 0px 0px 2px;
 }
+
+.input-field.input-error {
+  border-color: #dc2626 !important;
+  background-color: rgba(239, 68, 68, 0.02);
+}
+
+.input-field.input-error:focus {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+

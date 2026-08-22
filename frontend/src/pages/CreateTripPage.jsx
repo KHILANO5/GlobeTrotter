@@ -18,10 +18,12 @@ export default function CreateTripPage() {
     coverPhotoUrl: '',
   });
 
+  const [fieldErrors, setFieldErrors] = useState({});
   const [popularCities, setPopularCities] = useState([]);
   const [loadingCities, setLoadingCities] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [generalError, setGeneralError] = useState(null);
+  const [previewImageError, setPreviewImageError] = useState(false);
 
   // Fetch real-time destinations from the database
   useEffect(() => {
@@ -42,20 +44,57 @@ export default function CreateTripPage() {
     }
   };
 
-  // Live calculation of duration
-  const tripDuration = useMemo(() => {
-    if (!formData.startDate || !formData.endDate) return null;
+  // Helper to validate and calculate duration
+  const durationInfo = useMemo(() => {
+    if (!formData.startDate || !formData.endDate) {
+      return { valid: false, text: 'Select start and end dates' };
+    }
     const start = new Date(formData.startDate);
     const end = new Date(formData.endDate);
-    const diffTime = end - start;
-    const days = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    if (days <= 0) return 'Invalid dates (End must be on or after Start)';
-    return `${days} Days / ${days - 1} Nights`;
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return { valid: false, text: 'Invalid date format' };
+    }
+
+    if (end < start) {
+      return { valid: false, text: 'End date cannot be earlier than start date' };
+    }
+
+    const diffDays = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+
+    if (diffDays > 365) {
+      return { valid: false, text: 'Trip duration exceeds maximum limit of 365 days' };
+    }
+
+    if (diffDays === 1) {
+      return { valid: true, text: '1 Day (Single day journey)', days: 1 };
+    }
+
+    return { valid: true, text: `${diffDays} Days / ${diffDays - 1} Nights`, days: diffDays };
   }, [formData.startDate, formData.endDate]);
 
+  // Handle Input Changes & Clear Specific Field Error
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (fieldErrors[field]) {
+      setFieldErrors(prev => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
+    if (field === 'coverPhotoUrl') {
+      setPreviewImageError(false);
+    }
+    if (generalError) {
+      setGeneralError(null);
+    }
+  };
+
+  // Apply a popular destination from DB
   const handleApplyCityInspiration = (city) => {
-    const defaultDays = 7;
     const estimatedDailyCost = (city.costIndex || 2) * 120;
+    const defaultDays = durationInfo.valid && durationInfo.days ? durationInfo.days : 7;
     const calculatedBudget = estimatedDailyCost * defaultDays;
 
     setFormData(prev => ({
@@ -63,26 +102,104 @@ export default function CreateTripPage() {
       name: `Journey to ${city.name}`,
       description: city.description || `Exploring the culture, sights, and cuisine of ${city.name}, ${city.country}.`,
       coverPhotoUrl: city.imageUrl || prev.coverPhotoUrl,
-      totalBudget: prev.totalBudget || String(calculatedBudget),
+      totalBudget: prev.totalBudget ? prev.totalBudget : String(calculatedBudget),
     }));
+
+    setFieldErrors({});
+    setPreviewImageError(false);
+  };
+
+  // Client-side Validation for all edge cases
+  const validateForm = () => {
+    const errors = {};
+
+    // 1. Name
+    const trimmedName = formData.name.trim();
+    if (!trimmedName) {
+      errors.name = 'Trip name is required.';
+    } else if (trimmedName.length < 2) {
+      errors.name = 'Trip name must be at least 2 characters long.';
+    } else if (trimmedName.length > 120) {
+      errors.name = 'Trip name cannot exceed 120 characters.';
+    }
+
+    // 2. Dates
+    if (!formData.startDate) {
+      errors.startDate = 'Start date is required.';
+    }
+    if (!formData.endDate) {
+      errors.endDate = 'End date is required.';
+    }
+    if (formData.startDate && formData.endDate) {
+      const start = new Date(formData.startDate);
+      const end = new Date(formData.endDate);
+
+      if (isNaN(start.getTime())) {
+        errors.startDate = 'Invalid start date.';
+      }
+      if (isNaN(end.getTime())) {
+        errors.endDate = 'Invalid end date.';
+      }
+      if (end < start) {
+        errors.endDate = 'End date must be on or after start date.';
+      } else {
+        const diffDays = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        if (diffDays > 365) {
+          errors.endDate = 'Maximum trip duration is 365 days (1 year).';
+        }
+      }
+    }
+
+    // 3. Budget
+    if (formData.totalBudget !== '' && formData.totalBudget !== null) {
+      const budgetNum = Number(formData.totalBudget);
+      if (isNaN(budgetNum) || budgetNum < 0) {
+        errors.totalBudget = 'Budget must be a valid positive number (or 0).';
+      } else if (budgetNum > 10000000) {
+        errors.totalBudget = 'Budget cannot exceed $10,000,000.';
+      }
+    }
+
+    // 4. Cover Photo URL
+    if (formData.coverPhotoUrl && formData.coverPhotoUrl.trim()) {
+      const url = formData.coverPhotoUrl.trim();
+      const isHttp = /^https?:\/\//i.test(url);
+      const isData = url.startsWith('data:image/');
+      if (!isHttp && !isData) {
+        errors.coverPhotoUrl = 'Please enter a valid URL starting with http:// or https://';
+      }
+    }
+
+    // 5. Description
+    if (formData.description && formData.description.length > 1000) {
+      errors.description = 'Description cannot exceed 1000 characters.';
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
+    setGeneralError(null);
 
-    if (new Date(formData.endDate) < new Date(formData.startDate)) {
-      setError('End date cannot be earlier than start date.');
+    if (!validateForm()) {
       return;
     }
 
     setLoading(true);
 
     try {
-      const res = await api.post('/trips', {
-        ...formData,
-        totalBudget: formData.totalBudget ? parseFloat(formData.totalBudget) : null,
-      });
+      const payload = {
+        name: formData.name.trim(),
+        description: formData.description.trim() || null,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        totalBudget: formData.totalBudget !== '' ? parseFloat(formData.totalBudget) : null,
+        coverPhotoUrl: formData.coverPhotoUrl.trim() || null,
+      };
+
+      const res = await api.post('/trips', payload);
 
       if (res.data?.id) {
         navigate(`/trips/${res.data.id}/builder`);
@@ -91,7 +208,7 @@ export default function CreateTripPage() {
       }
     } catch (err) {
       console.error('Error creating trip:', err);
-      setError(err.message || 'Failed to create trip.');
+      setGeneralError(err.message || 'Failed to create trip. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -130,7 +247,7 @@ export default function CreateTripPage() {
                   type="button"
                   onClick={() => handleApplyCityInspiration(city)}
                   className="filter-pill"
-                  style={{ fontSize: '12px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                  style={{ fontSize: '12px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
                   title={`Cost Index: ${city.costIndex}/5 • Region: ${city.region}`}
                 >
                   📍 {city.name}, {city.country}
@@ -140,25 +257,36 @@ export default function CreateTripPage() {
           )}
         </div>
 
-        {error && (
-          <div style={{ padding: '0.75rem 1rem', backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', color: '#dc2626', marginBottom: '1.5rem' }}>
-            ⚠️ {error}
+        {generalError && (
+          <div style={{ padding: '0.85rem 1.15rem', backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', color: '#dc2626', marginBottom: '1.5rem', fontSize: '14px' }}>
+            ⚠️ {generalError}
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           {/* Trip Name */}
           <div className="input-group">
-            <label htmlFor="name">Trip Name *</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label htmlFor="name">Trip Name *</label>
+              <span style={{ fontSize: '11px', color: formData.name.length > 120 ? '#dc2626' : 'var(--text-muted)' }}>
+                {formData.name.length}/120
+              </span>
+            </div>
             <input
               id="name"
               type="text"
-              className="input-field"
+              className={`input-field ${fieldErrors.name ? 'input-error' : ''}`}
               placeholder="e.g. Summer in Kyoto, European Highlights..."
               value={formData.name}
-              onChange={e => setFormData({ ...formData, name: e.target.value })}
+              maxLength={120}
+              onChange={e => handleChange('name', e.target.value)}
               required
             />
+            {fieldErrors.name && (
+              <span style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                {fieldErrors.name}
+              </span>
+            )}
           </div>
 
           {/* Date Picker with Live Counter */}
@@ -168,30 +296,56 @@ export default function CreateTripPage() {
               <input
                 id="startDate"
                 type="date"
-                className="input-field"
+                className={`input-field ${fieldErrors.startDate ? 'input-error' : ''}`}
                 value={formData.startDate}
-                onChange={e => setFormData({ ...formData, startDate: e.target.value })}
+                onChange={e => handleChange('startDate', e.target.value)}
                 required
               />
+              {fieldErrors.startDate && (
+                <span style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                  {fieldErrors.startDate}
+                </span>
+              )}
             </div>
+
             <div className="input-group">
               <label htmlFor="endDate">End Date *</label>
               <input
                 id="endDate"
                 type="date"
-                className="input-field"
+                className={`input-field ${fieldErrors.endDate ? 'input-error' : ''}`}
                 value={formData.endDate}
-                onChange={e => setFormData({ ...formData, endDate: e.target.value })}
+                min={formData.startDate || today}
+                onChange={e => handleChange('endDate', e.target.value)}
                 required
               />
+              {fieldErrors.endDate && (
+                <span style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                  {fieldErrors.endDate}
+                </span>
+              )}
             </div>
           </div>
 
-          {tripDuration && (
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.85rem', backgroundColor: 'rgba(46, 125, 50, 0.08)', color: 'var(--accent-green)', borderRadius: '6px', fontSize: '13px', fontWeight: '600', marginBottom: '1.25rem' }}>
-              🗓️ Calculated Duration: {tripDuration}
+          {/* Duration Status Pill */}
+          <div style={{ marginBottom: '1.25rem' }}>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.4rem 0.85rem',
+                backgroundColor: durationInfo.valid ? 'rgba(46, 125, 50, 0.08)' : 'rgba(239, 68, 68, 0.08)',
+                color: durationInfo.valid ? 'var(--accent-green)' : '#dc2626',
+                border: `1px solid ${durationInfo.valid ? 'rgba(46, 125, 50, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`,
+                borderRadius: '6px',
+                fontSize: '13px',
+                fontWeight: '600',
+              }}
+            >
+              {durationInfo.valid ? '🗓️ Calculated Duration:' : '⚠️ Date Range:'} {durationInfo.text}
             </div>
-          )}
+          </div>
 
           {/* Target Budget & Cover Photo */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
@@ -201,43 +355,110 @@ export default function CreateTripPage() {
                 id="totalBudget"
                 type="number"
                 min="0"
-                step="50"
-                className="input-field"
+                max="10000000"
+                step="any"
+                className={`input-field ${fieldErrors.totalBudget ? 'input-error' : ''}`}
                 placeholder="e.g. 2500"
                 value={formData.totalBudget}
-                onChange={e => setFormData({ ...formData, totalBudget: e.target.value })}
+                onChange={e => handleChange('totalBudget', e.target.value)}
               />
+              {fieldErrors.totalBudget && (
+                <span style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                  {fieldErrors.totalBudget}
+                </span>
+              )}
             </div>
+
             <div className="input-group">
               <label htmlFor="coverPhotoUrl">Cover Photo URL (Optional)</label>
               <input
                 id="coverPhotoUrl"
                 type="url"
-                className="input-field"
+                className={`input-field ${fieldErrors.coverPhotoUrl ? 'input-error' : ''}`}
                 placeholder="https://images.unsplash.com/..."
                 value={formData.coverPhotoUrl}
-                onChange={e => setFormData({ ...formData, coverPhotoUrl: e.target.value })}
+                onChange={e => handleChange('coverPhotoUrl', e.target.value)}
               />
+              {fieldErrors.coverPhotoUrl && (
+                <span style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                  {fieldErrors.coverPhotoUrl}
+                </span>
+              )}
             </div>
           </div>
 
+          {/* Image Thumbnail Preview */}
+          {formData.coverPhotoUrl && !fieldErrors.coverPhotoUrl && (
+            <div style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem', backgroundColor: 'var(--bg-page)', borderRadius: '8px', border: '1px solid var(--border-passive)' }}>
+              {!previewImageError ? (
+                <img
+                  src={formData.coverPhotoUrl}
+                  alt="Trip cover preview"
+                  onError={() => setPreviewImageError(true)}
+                  style={{ width: '80px', height: '50px', objectFit: 'cover', borderRadius: '6px' }}
+                />
+              ) : (
+                <div style={{ width: '80px', height: '50px', backgroundColor: 'rgba(0,0,0,0.06)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', color: 'var(--text-muted)' }}>
+                  No Preview
+                </div>
+              )}
+              <div style={{ flex: 1, fontSize: '12px' }}>
+                <div style={{ fontWeight: '600', color: 'var(--text-charcoal)' }}>Cover Image Preview</div>
+                <div style={{ color: previewImageError ? '#dc2626' : 'var(--text-muted)' }}>
+                  {previewImageError ? 'Unable to load image preview from this URL' : 'Image loaded successfully'}
+                </div>
+              </div>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => handleChange('coverPhotoUrl', '')}
+                style={{ fontSize: '12px', padding: '4px 8px' }}
+              >
+                Remove
+              </button>
+            </div>
+          )}
+
           {/* Description */}
           <div className="input-group">
-            <label htmlFor="description">Trip Description & Highlights</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label htmlFor="description">Trip Description & Highlights</label>
+              <span style={{ fontSize: '11px', color: formData.description.length > 1000 ? '#dc2626' : 'var(--text-muted)' }}>
+                {formData.description.length}/1000
+              </span>
+            </div>
             <textarea
               id="description"
-              className="input-field"
+              className={`input-field ${fieldErrors.description ? 'input-error' : ''}`}
               rows={3}
+              maxLength={1000}
               placeholder="Notes about destinations, packing lists, flight references, or companions..."
               value={formData.description}
-              onChange={e => setFormData({ ...formData, description: e.target.value })}
+              onChange={e => handleChange('description', e.target.value)}
             />
+            {fieldErrors.description && (
+              <span style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                {fieldErrors.description}
+              </span>
+            )}
           </div>
 
-          {/* Submit Action */}
+          {/* Submit Action with Double-Click Protection */}
           <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-            <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={loading}>
-              {loading ? 'Creating Trip...' : 'Create Trip & Proceed to Builder →'}
+            <button
+              type="submit"
+              className="btn btn-primary"
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+              disabled={loading || !durationInfo.valid}
+            >
+              {loading ? (
+                <>
+                  <span style={{ display: 'inline-block', width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                  Creating Trip...
+                </>
+              ) : (
+                'Create Trip & Proceed to Builder →'
+              )}
             </button>
             <Link to="/dashboard" className="btn btn-secondary">
               Cancel
