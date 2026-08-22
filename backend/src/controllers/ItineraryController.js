@@ -345,7 +345,11 @@ const getItinerary = async (req, res) => {
       const dayActivities = allActivities
         .filter(a => {
           if (a.scheduledDate) return a.scheduledDate === dateStr;
-          return a.tripStopId === activeStop?.id;
+          const stopStartStr = activeStop?.startDate ? new Date(activeStop.startDate).toISOString().split('T')[0] : null;
+          if (stopStartStr) {
+            return a.tripStopId === activeStop?.id && dateStr === stopStartStr;
+          }
+          return a.tripStopId === activeStop?.id && i === 0;
         })
         .map(a => ({
           id: a.id,
