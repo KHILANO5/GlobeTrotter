@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
+
 const authController = require('../controllers/authController');
 const { authenticateUser, requireRole } = require('../middleware/authMiddleware');
 
 // Public routes
-router.post('/register', authController.register);
+router.post('/register', upload.single('profilePicture'), authController.register);
 router.post('/login', authController.login);
 router.post('/verify-email', authController.verifyEmail);
 router.post('/forgot-password', authController.forgotPassword);

@@ -4,29 +4,45 @@ const { eq, sql } = require('drizzle-orm');
 const { db } = require('../config/db');
 const { users } = require('../db/schema');
 const { sendVerificationCode, sendResetPasswordCode } = require('../utils/mailer');
+const imagekit = require('../services/imagekit');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'hackathon_secret_key_123!';
 
 // Register a new user with email verification code
 const register = async (req, res) => {
-  const { fullName, email, password } = req.body;
+  const { firstName, lastName, username, email, password } = req.body;
 
-  if (!fullName || !email || !password) {
-    return res.status(400).json({ error: 'Full name, email, and password are required.' });
+  if (!firstName || !lastName || !username || !email || !password) {
+    return res.status(400).json({ error: 'All fields are required.' });
   }
 
   try {
     const cleanEmail = email.toLowerCase().trim();
+    const cleanUsername = username.toLowerCase().trim();
     
-    // Check if email already exists
+    // Check if email or username already exists
     const existingUser = await db
       .select()
       .from(users)
-      .where(eq(users.email, cleanEmail))
+      .where(sql`${users.email} = ${cleanEmail} OR ${users.username} = ${cleanUsername}`)
       .limit(1);
 
     if (existingUser.length > 0) {
-      return res.status(400).json({ error: 'A user with this email already exists.' });
+      if (existingUser[0].email === cleanEmail) {
+        return res.status(400).json({ error: 'A user with this email already exists.' });
+      } else {
+        return res.status(400).json({ error: 'Username is already taken.' });
+      }
+    }
+
+    let photoUrl = null;
+    if (req.file) {
+      const uploadResponse = await imagekit.upload({
+        file: req.file.buffer,
+        fileName: `profile_${Date.now()}_${req.file.originalname}`,
+        folder: '/profiles'
+      });
+      photoUrl = uploadResponse.url;
     }
 
     // Generate a 6-digit verification code
@@ -35,15 +51,20 @@ const register = async (req, res) => {
 
     // Insert new unverified user
     const [newUser] = await db.insert(users).values({
-      fullName: fullName.trim(),
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      username: cleanUsername,
       email: cleanEmail,
-      password: hashedPassword,
-      role: 'USER',
+      passwordHash: hashedPassword,
+      role: 'user',
       isVerified: false,
-      verificationCode: verificationCode
+      verificationCode: verificationCode,
+      photoUrl: photoUrl
     }).returning({
       id: users.id,
-      fullName: users.fullName,
+      firstName: users.firstName,
+      lastName: users.lastName,
+      username: users.username,
       email: users.email,
       role: users.role,
       isVerified: users.isVerified,
@@ -87,7 +108,7 @@ const login = async (req, res) => {
     }
 
     // Compare passwords
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
@@ -117,7 +138,10 @@ const login = async (req, res) => {
       token,
       user: {
         id: user.id,
-        fullName: user.fullName,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        photoUrl: user.photoUrl,
         email: user.email,
         role: user.role
       }
@@ -251,7 +275,7 @@ const resetPassword = async (req, res) => {
     await db
       .update(users)
       .set({
-        password: hashedPassword,
+        passwordHash: hashedPassword,
         resetPasswordCode: null
       })
       .where(eq(users.id, user.id));
@@ -271,7 +295,10 @@ const getProfile = async (req, res) => {
     const [user] = await db
       .select({
         id: users.id,
-        fullName: users.fullName,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        username: users.username,
+        photoUrl: users.photoUrl,
         email: users.email,
         role: users.role,
         createdAt: users.createdAt
@@ -297,7 +324,9 @@ const getAdminDashboard = async (req, res) => {
     const usersCountResult = await db.select({ count: sql`count(*)` }).from(users);
     const usersList = await db.select({
       id: users.id,
-      fullName: users.fullName,
+      firstName: users.firstName,
+      lastName: users.lastName,
+      username: users.username,
       email: users.email,
       role: users.role,
       isVerified: users.isVerified,
